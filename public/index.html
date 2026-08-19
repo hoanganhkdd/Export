@@ -145,6 +145,20 @@
     </div>
   </div>
 
+  <script>
+    // Tự phục hồi khi Render "khởi động nguội": nếu app chưa init sau 8s (asset tải hụt), tải lại 1 lần.
+    window.__appReady = false;
+    window.addEventListener('load', function () {
+      setTimeout(function () {
+        try {
+          if (!window.__appReady && !sessionStorage.getItem('coldReload')) {
+            sessionStorage.setItem('coldReload', '1');
+            location.reload();
+          }
+        } catch (e) {}
+      }, 8000);
+    });
+  </script>
   <script src="js/app.js" type="module"></script>
 </body>
 </html>

@@ -18,18 +18,32 @@ const state = {
 
 // ---------- Boot ----------
 init();
+async function fetchRetry(url, opts, tries = 4, delay = 1500) {
+  for (let i = 0; i < tries; i++) {
+    try {
+      const r = await fetch(url, opts);
+      if (r.ok) return r;
+      throw new Error('HTTP ' + r.status);
+    } catch (e) {
+      if (i === tries - 1) throw e;
+      await new Promise(s => setTimeout(s, delay));
+    }
+  }
+}
 async function init() {
   bindGlobalUI();
   applyTheme(localStorage.getItem('exp_theme') || 'light');
   try {
-    const c = await fetch('/api/curriculum').then(r => r.json());
+    const c = await fetchRetry('/api/curriculum').then(r => r.json());
     state.curriculum = c;
     state.sessions = c.sessions;
     c.sessions.forEach(s => state.byId[s.id] = s);
   } catch (e) {
-    $('#main').innerHTML = `<div class="empty-state">Không tải được giáo án. Hãy chắc chắn server đang chạy.<br><code>npm start</code></div>`;
+    $('#main').innerHTML = `<div class="empty-state">Máy chủ đang khởi động (Render free tier ngủ sau 15 phút không dùng).<br>Vui lòng chờ ~30 giây rồi <a href="javascript:location.reload()">tải lại trang</a>.</div>`;
     return;
   }
+  window.__appReady = true;
+  try { sessionStorage.removeItem('coldReload'); } catch {}
   await refreshResourceCounts();
   renderNav();
   const startId = location.hash.replace('#', '');
