@@ -1,0 +1,26 @@
+# Render Blueprint — tự động cấu hình khi bạn deploy repo này lên Render.
+# https://render.com  →  New  →  Blueprint  →  chọn repo này.
+services:
+  - type: web
+    name: hoc-xuat-khau
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      # Điền giá trị thật ở Render Dashboard (Environment) — KHÔNG ghi key vào file này.
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
+      # Bỏ ghi chú 2 dòng dưới nếu bạn gắn Persistent Disk (mục disk bên dưới) để lưu bền file upload & insight.
+      # - key: DATA_DIR
+      #   value: /var/data
+
+    # ---- (TÙY CHỌN) Ổ đĩa lưu bền — cần gói trả phí của Render ----
+    # Bỏ ghi chú khối này + khối DATA_DIR ở trên để file upload / insight KHÔNG mất khi restart.
+    # disk:
+    #   name: export-data
+    #   mountPath: /var/data
+    #   sizeGB: 1

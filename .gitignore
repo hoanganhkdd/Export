@@ -1,0 +1,8 @@
+node_modules/
+.env
+
+# API key — KHÔNG BAO GIỜ commit
+server/data/settings.json
+
+# Log cục bộ
+*.log

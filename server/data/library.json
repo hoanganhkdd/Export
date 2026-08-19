@@ -1,0 +1,385 @@
+{
+ "resources": [
+  {
+   "id": "8d13d9d5ea684cc5",
+   "sessionId": "s0",
+   "type": "pdf",
+   "title": "Mẫu Company Profile (MEKONG SUN)",
+   "url": "/uploads/8d13d9d5ea684cc5__Company-Profile.pdf",
+   "note": "Ví dụ thật một Company Profile 2–4 trang tiếng Anh — tham chiếu khi dựng hồ sơ của bạn ở bước Nền tảng.",
+   "tags": [
+    "company-profile",
+    "mẫu",
+    "tiếng anh"
+   ],
+   "file": {
+    "name": "Company-Profile.pdf",
+    "size": 1107616,
+    "mime": "application/pdf"
+   },
+   "createdAt": 1787094706516,
+   "insight": {
+    "text": "**📌 Tóm tắt**  \nMẫu Company Profile của MEKONG SUN, thương hiệu xuất khẩu của Hoang Anh Export Co., Ltd, giới thiệu về khả năng xuất khẩu các sản phẩm trái cây nhiệt đới từ đồng bằng sông Cửu Long, Việt Nam. Công ty tập trung vào việc cung cấp sản phẩm chất lượng cao với tài liệu đầy đủ, hướng đến các thị trường như Singapore, Úc và Trung Đông.\n\n**💡 Điểm chính**  \n- MEKONG SUN chuyên xuất khẩu xoài sấy, dừa tươi và dừa sấy từ đồng bằng sông Cửu Long.\n- Công ty chú trọng vào việc cung cấp tài liệu và chứng nhận phù hợp với từng thị trường.\n- Sản phẩm có chứng nhận HACCP, ISO 22000 và đang tiến tới các chứng nhận khác như Halal, BRC/IFS.\n- Tập trung vào các thị trường có nhu cầu cao về sản phẩm sạch và dễ dàng đạt được chứng nhận.\n- Đề cao giá trị trung thực, kỷ luật trong tài liệu và xây dựng quan hệ đối tác lâu dài.\n- Cung cấp dịch vụ đóng gói theo yêu cầu và nhãn hiệu riêng cho khách hàng.\n- Đảm bảo giao tiếp nhanh chóng và hiệu quả với khách hàng.\n\n**✅ Áp dụng vào lô hàng thật**  \n1. **Xác định thị trường mục tiêu**: Lựa chọn thị trường có nhu cầu cao về sản phẩm sạch và dễ dàng đạt được chứng nhận như Singapore hoặc Úc để bắt đầu.\n2. **Chuẩn bị tài liệu**: Đảm bảo tất cả các chứng nhận và tài liệu cần thiết như HACCP, ISO 22000, và các chứng nhận khác được hoàn thành trước khi xuất khẩu.\n3. **Thiết lập quy trình giao tiếp**: Đảm bảo phản hồi khách hàng trong vòng một ngày làm việc để duy trì mối quan hệ tốt và giải quyết nhanh chóng các vấn đề phát sinh.\n\n**🔤 Thuật ngữ Anh–Việt**  \n- HACCP: Phân tích mối nguy và điểm kiểm soát tới hạn\n- ISO 22000: Tiêu chuẩn quản lý an toàn thực phẩm\n- BRC: Tiêu chuẩn toàn cầu về an toàn thực phẩm\n- IFS: Tiêu chuẩn thực phẩm quốc tế\n- COA: Chứng nhận phân tích\n- Phytosanitary Certificate: Giấy chứng nhận kiểm dịch thực vật",
+    "source": "tài liệu PDF",
+    "createdAt": 1787096665552
+   }
+  },
+  {
+   "id": "6527976156917aa1",
+   "sessionId": "s3",
+   "type": "pdf",
+   "title": "Mẫu Catalogue sản phẩm (MEKONG SUN)",
+   "url": "/uploads/6527976156917aa1__Catalogue.pdf",
+   "note": "Catalogue 6 trang: cover, giới thiệu, sản phẩm kèm giá FOB, điều khoản. Dùng làm mẫu bộ tài liệu bán hàng.",
+   "tags": [
+    "catalogue",
+    "mẫu",
+    "báo giá"
+   ],
+   "file": {
+    "name": "Catalogue.pdf",
+    "size": 1934705,
+    "mime": "application/pdf"
+   },
+   "createdAt": 1787094706515
+  },
+  {
+   "id": "e4c44fa29bf84d3b",
+   "sessionId": "s3",
+   "type": "pdf",
+   "title": "B2B Marketing Playbook (nông sản sấy)",
+   "url": "/uploads/e4c44fa29bf84d3b__B2B-Marketing-Playbook.pdf",
+   "note": "Chiến lược B2B: định vị, 4 nhóm ICP, kênh, phễu lead, KPI, kế hoạch 90 ngày. Bổ trợ cho giai đoạn tiếp cận & chào giá.",
+   "tags": [
+    "b2b",
+    "marketing",
+    "icp"
+   ],
+   "file": {
+    "name": "B2B-Marketing-Playbook.pdf",
+    "size": 241256,
+    "mime": "application/pdf"
+   },
+   "createdAt": 1787094706514
+  },
+  {
+   "id": "33d64fd6c0fbf76a",
+   "sessionId": "s3",
+   "type": "pdf",
+   "title": "Line Card · Spec Sheet · COA mẫu",
+   "url": "/uploads/33d64fd6c0fbf76a__Line-Card-Spec-Sheet.pdf",
+   "note": "Bảng giá FOB theo bậc + thông số kỹ thuật + mẫu Certificate of Analysis. Gửi kèm mọi báo giá.",
+   "tags": [
+    "spec-sheet",
+    "coa",
+    "giá fob"
+   ],
+   "file": {
+    "name": "Line-Card-Spec-Sheet.pdf",
+    "size": 167445,
+    "mime": "application/pdf"
+   },
+   "createdAt": 1787094706513
+  },
+  {
+   "id": "00cc592e3953f773",
+   "sessionId": "s2",
+   "type": "pdf",
+   "title": "Khung Target Buyer List (ICP)",
+   "url": "/uploads/00cc592e3953f773__Target-Buyer-List.pdf",
+   "note": "Khung 300 khách hàng mục tiêu (SG/AU/UAE): phân bổ, chức danh, nguồn tìm lead, cột theo dõi. Mẫu cho Buyer Master.",
+   "tags": [
+    "buyer",
+    "icp",
+    "danh sách"
+   ],
+   "file": {
+    "name": "Target-Buyer-List.pdf",
+    "size": 187383,
+    "mime": "application/pdf"
+   },
+   "createdAt": 1787094706512
+  },
+  {
+   "id": "bfeda090fc425a9e",
+   "sessionId": "s4",
+   "type": "link",
+   "title": "Bảng giá sàn theo ngạch (Excel)",
+   "url": "/uploads/bfeda090fc425a9e__Bang-gia-san-theo-ngach.xlsx",
+   "note": "File Excel bảng giá tham chiếu — mở bằng Excel/Google Sheets. Bổ trợ khi dựng Export Costing Sheet.",
+   "tags": [
+    "giá",
+    "excel",
+    "chi phí"
+   ],
+   "file": {
+    "name": "Bang-gia-san-theo-ngach.xlsx",
+    "size": 10323,
+    "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+   },
+   "createdAt": 1787094706511
+  },
+  {
+   "id": "b5cf0ad39c542c7f",
+   "sessionId": "s1",
+   "type": "link",
+   "title": "Biểu thuế XNK Việt Nam (tra mã HS 8 số & thuế)",
+   "url": "https://www.customs.gov.vn/",
+   "note": "Tra mã 8 số và thuế suất xuất khẩu.",
+   "tags": [
+    "hs-code",
+    "thuế"
+   ],
+   "file": null,
+   "createdAt": 1787094706510
+  },
+  {
+   "id": "ed2647e56b3a8039",
+   "sessionId": "s1",
+   "type": "link",
+   "title": "UN Comtrade — dòng chảy thương mại theo HS",
+   "url": "https://comtradeplus.un.org/",
+   "note": "Kiểm tra chéo mã HS: nước bạn định bán có nhập mã đó không, nhập từ đâu.",
+   "tags": [
+    "hs-code",
+    "thị trường"
+   ],
+   "file": null,
+   "createdAt": 1787094706509
+  },
+  {
+   "id": "6c38a13cd1bdb927",
+   "sessionId": "s1",
+   "type": "link",
+   "title": "Trade Map (ITC) — kim ngạch NK theo HS & nước",
+   "url": "https://www.trademap.org/",
+   "note": "Quy mô nhập khẩu, tăng trưởng, nước cung cấp, đơn giá trung bình.",
+   "tags": [
+    "thị trường",
+    "số liệu"
+   ],
+   "file": null,
+   "createdAt": 1787094706508
+  },
+  {
+   "id": "0aa3b666fe6f68e4",
+   "sessionId": "s1",
+   "type": "link",
+   "title": "Market Access Map (ITC) — thuế MFN & FTA",
+   "url": "https://www.macmap.org/",
+   "note": "Thuế nhập khẩu MFN và thuế ưu đãi theo FTA theo mã HS.",
+   "tags": [
+    "thuế",
+    "fta"
+   ],
+   "file": null,
+   "createdAt": 1787094706507
+  },
+  {
+   "id": "9cc56f005cfe5ad9",
+   "sessionId": "s2",
+   "type": "link",
+   "title": "ImportYeti — dữ liệu vận đơn nhập khẩu vào Mỹ",
+   "url": "https://www.importyeti.com/",
+   "note": "Biết ai thực sự đang mua: nhà cung cấp hiện tại, tần suất, quy mô lô.",
+   "tags": [
+    "buyer",
+    "vận đơn"
+   ],
+   "file": null,
+   "createdAt": 1787094706506
+  },
+  {
+   "id": "2625a3a09c73ba90",
+   "sessionId": "s2",
+   "type": "link",
+   "title": "Hunter.io — tìm & xác thực email theo domain",
+   "url": "https://hunter.io/",
+   "note": "Đoán mẫu email công ty và verify trước khi gửi.",
+   "tags": [
+    "email",
+    "outreach"
+   ],
+   "file": null,
+   "createdAt": 1787094706505
+  },
+  {
+   "id": "03fb114ceafaded0",
+   "sessionId": "s2",
+   "type": "link",
+   "title": "Snov.io — bổ sung khi hết lượt Hunter",
+   "url": "https://snov.io/",
+   "note": "Tìm & xác thực email, 50 lượt/tháng miễn phí.",
+   "tags": [
+    "email",
+    "outreach"
+   ],
+   "file": null,
+   "createdAt": 1787094706504
+  },
+  {
+   "id": "d551ec9d6fdae0a8",
+   "sessionId": "s3",
+   "type": "link",
+   "title": "Canva — Company Profile, catalogue, name card",
+   "url": "https://www.canva.com/",
+   "note": "Trình bày bộ tài liệu bán hàng.",
+   "tags": [
+    "thiết kế",
+    "tài liệu"
+   ],
+   "file": null,
+   "createdAt": 1787094706503
+  },
+  {
+   "id": "436367072f0bbde8",
+   "sessionId": "s3",
+   "type": "link",
+   "title": "Remove.bg — tách nền ảnh sản phẩm",
+   "url": "https://www.remove.bg/",
+   "note": "Ảnh sản phẩm nền trắng cho catalogue.",
+   "tags": [
+    "ảnh",
+    "catalogue"
+   ],
+   "file": null,
+   "createdAt": 1787094706502
+  },
+  {
+   "id": "03e9ea264ac744d0",
+   "sessionId": "s4",
+   "type": "link",
+   "title": "Incoterms 2020 (ICC) — điều kiện giao hàng",
+   "url": "https://iccwbo.org/business-solutions/incoterms-rules/incoterms-2020/",
+   "note": "FOB, CIF, EXW… nền tảng cho công thức giá xuất khẩu.",
+   "tags": [
+    "incoterms",
+    "giá"
+   ],
+   "file": null,
+   "createdAt": 1787094706501
+  },
+  {
+   "id": "c9dce614ab220777",
+   "sessionId": "r4",
+   "type": "link",
+   "title": "n8n — tự động hóa workflow (cảnh báo deadline)",
+   "url": "https://n8n.io/",
+   "note": "Tự gửi email mỗi sáng danh sách việc đến hạn theo Shipment Master.",
+   "tags": [
+    "tự động hóa",
+    "n8n"
+   ],
+   "file": null,
+   "createdAt": 1787094706500
+  },
+  {
+   "id": "fbdc5b0dc70b4927",
+   "sessionId": "r4",
+   "type": "link",
+   "title": "Google Workspace — Drive/Sheets/Calendar",
+   "url": "https://workspace.google.com/",
+   "note": "Hạ tầng lưu trữ, 5 bảng dữ liệu, lịch nhắc cut-off.",
+   "tags": [
+    "công cụ",
+    "lưu trữ"
+   ],
+   "file": null,
+   "createdAt": 1787094706499
+  },
+  {
+   "id": "b8992ac0a73f30b1",
+   "sessionId": "s0",
+   "type": "youtube",
+   "title": "Phân biệt Xuất nhập khẩu và Logistics",
+   "url": "https://www.youtube.com/watch?v=OVhwmmmC_w4",
+   "note": "Video nền tảng phân biệt hai mảng — xem trước khi vào giai đoạn 1.",
+   "tags": [
+    "nền tảng",
+    "video"
+   ],
+   "file": null,
+   "createdAt": 1787095185654,
+   "insight": {
+    "text": "**📌 Tóm tắt**  \nVideo giải thích sự khác biệt giữa xuất nhập khẩu và logistics, nhấn mạnh rằng hai lĩnh vực này có mối quan hệ chặt chẽ và hỗ trợ lẫn nhau. Xuất nhập khẩu liên quan đến sản phẩm hữu hình, trong khi logistics tập trung vào dịch vụ vận chuyển và lưu trữ.\n\n**💡 Điểm chính**  \n- Xuất nhập khẩu liên quan đến sản phẩm hữu hình như hàng hóa, thiết bị y tế.\n- Logistics là dịch vụ vận chuyển, lưu trữ, không có sản phẩm hữu hình.\n- Khai báo hải quan là một phần quan trọng trong xuất nhập khẩu và là một mắt xích trong logistics.\n- Các công ty xuất nhập khẩu có thể tự khai báo hải quan hoặc thuê dịch vụ.\n- Phòng xuất nhập khẩu trong công ty logistics và công ty xuất nhập khẩu có nhiệm vụ khác nhau.\n- Xuất nhập khẩu và logistics không phụ thuộc vào nhau, mà cùng phát triển hoặc suy thoái.\n- Lựa chọn làm việc trong lĩnh vực nào phụ thuộc vào định hướng nghề nghiệp cá nhân.\n\n**✅ Áp dụng vào lô hàng thật**  \n1. **Xác định rõ vai trò**: Nhà xuất khẩu cần xác định rõ vai trò của mình trong chuỗi cung ứng và quyết định xem có nên tự thực hiện khai báo hải quan hay thuê ngoài.\n2. **Lựa chọn đối tác logistics**: Chọn đối tác logistics phù hợp để đảm bảo hàng hóa được vận chuyển và lưu trữ an toàn, hiệu quả.\n3. **Tối ưu hóa quy trình**: Tích hợp các dịch vụ logistics vào quy trình xuất nhập khẩu để tối ưu hóa chi phí và thời gian giao hàng.\n\n**🔤 Thuật ngữ Anh–Việt**  \n- Logistics: Hậu cần\n- Export: Xuất khẩu\n- Import: Nhập khẩu\n- Customs declaration: Khai báo hải quan\n- Supply chain: Chuỗi cung ứng",
+    "source": "transcript video",
+    "createdAt": 1787096637005
+   }
+  },
+  {
+   "id": "4c387928d5274728",
+   "sessionId": "s0",
+   "type": "link",
+   "title": "Playlist: Tự học Xuất nhập khẩu – Logistics",
+   "url": "https://www.youtube.com/playlist?list=PL0sHE09tY2WqJW8o1P3jkzNaB6ixBFF9x",
+   "note": "Playlist tự học từ cơ bản đến nâng cao.",
+   "tags": [
+    "playlist",
+    "tự học"
+   ],
+   "file": null,
+   "createdAt": 1787095185655,
+   "insight": {
+    "text": "**📌 Tóm tắt**  \nTrang web giới thiệu một playlist trên YouTube về tự học xuất nhập khẩu và logistics. Nội dung chủ yếu là các thông tin về bản quyền, liên hệ và điều khoản sử dụng của YouTube.\n\n**💡 Điểm chính**  \n- Playlist tập trung vào việc tự học về xuất nhập khẩu và logistics.\n- Nội dung liên quan đến các điều khoản và chính sách của YouTube.\n- Không có thông tin chi tiết về nội dung học tập cụ thể.\n- Trang web thuộc sở hữu của Google LLC.\n- Không có hướng dẫn cụ thể cho nhà xuất khẩu.\n\n**✅ Áp dụng vào lô hàng thật**  \n- Tìm kiếm playlist trên YouTube để tự học về quy trình xuất khẩu.\n- Tập trung vào các video hướng dẫn về quy trình và thủ tục hải quan.\n- Sử dụng kiến thức từ video để cải thiện quy trình vận hành xuất khẩu của doanh nghiệp.\n\n**🔤 Thuật ngữ Anh–Việt**  \nKhông có thuật ngữ chuyên ngành xuất hiện trong nội dung.",
+    "source": "trang web",
+    "createdAt": 1787096787801
+   }
+  },
+  {
+   "id": "e1113b5430fb9ccf",
+   "sessionId": "r4",
+   "type": "link",
+   "title": "Kênh YouTube: Xuất Nhập Khẩu Lê Ánh Official",
+   "url": "https://www.youtube.com/channel/UCulkgbWumnEKRZRvAFhNxeQ",
+   "note": "Trung tâm đào tạo XNK, hàng trăm video nghiệp vụ (HS code, Incoterms, L/C, chứng từ).",
+   "tags": [
+    "kênh",
+    "đào tạo"
+   ],
+   "file": null,
+   "createdAt": 1787095185656
+  },
+  {
+   "id": "dc49b0d9ce80cba3",
+   "sessionId": "r4",
+   "type": "link",
+   "title": "Kênh YouTube: Song Ánh Logistics",
+   "url": "https://www.youtube.com/channel/UCG1wvQyBORFZ__5ENJs6nGg",
+   "note": "Học xuất nhập khẩu thực tế qua tình huống.",
+   "tags": [
+    "kênh",
+    "thực tế"
+   ],
+   "file": null,
+   "createdAt": 1787095185657
+  },
+  {
+   "id": "b622b5e9f68da2c8",
+   "sessionId": "r4",
+   "type": "link",
+   "title": "Kênh YouTube: Mison Trans – Logistics TV",
+   "url": "https://www.youtube.com/channel/UC-_m2sk7zG01R5KXxYhaA-w",
+   "note": "Video nghiệp vụ logistics & thủ tục.",
+   "tags": [
+    "kênh",
+    "logistics"
+   ],
+   "file": null,
+   "createdAt": 1787095185658
+  },
+  {
+   "id": "5cab7aa91d42f0a0",
+   "sessionId": "s2",
+   "type": "link",
+   "title": "Kênh YouTube: Học Xuất Nhập Khẩu",
+   "url": "https://www.youtube.com/hocxuatnhapkhautuxa",
+   "note": "Nội dung tìm khách, chào hàng, nghiệp vụ XNK.",
+   "tags": [
+    "kênh",
+    "buyer"
+   ],
+   "file": null,
+   "createdAt": 1787095185659
+  }
+ ]
+}

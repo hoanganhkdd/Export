@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Học Vận hành Xuất khẩu End-to-End</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📦%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-logo">📦</span>
+      <div>
+        <div class="brand-title">Vận hành Xuất khẩu <b>End-to-End</b></div>
+        <div class="brand-sub">Giáo án tự học cho nhà xuất khẩu một người</div>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <div class="progress-wrap" title="Tiến độ hoàn thành">
+        <div class="progress-bar"><span id="progressFill"></span></div>
+        <span id="progressText" class="progress-text">0%</span>
+      </div>
+      <button class="btn ghost" id="btnLibrary">📚 Thư viện chung</button>
+      <button class="btn ghost" id="btnSettings" title="Cài đặt AI">⚙️</button>
+      <button class="btn ghost icon" id="btnTheme" title="Đổi giao diện sáng/tối">🌙</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-search">
+        <input type="search" id="sessionSearch" placeholder="Tìm session…" />
+      </div>
+      <nav id="sessionNav"></nav>
+    </aside>
+
+    <main class="main" id="main">
+      <div class="loading" id="loading">Đang tải giáo án…</div>
+    </main>
+  </div>
+
+  <!-- Modal: Thư viện chung -->
+  <div class="modal-backdrop" id="libraryModal" hidden>
+    <div class="modal wide">
+      <div class="modal-head">
+        <h2>📚 Thư viện tài liệu chung</h2>
+        <button class="btn ghost icon" data-close>✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="lib-toolbar">
+          <input type="search" id="libSearch" placeholder="Tìm theo tên, ghi chú, tag, link…" />
+          <select id="libTypeFilter">
+            <option value="">Tất cả loại</option>
+            <option value="text">📝 Ghi chú</option>
+            <option value="image">🖼️ Ảnh</option>
+            <option value="pdf">📄 PDF</option>
+            <option value="youtube">▶️ YouTube</option>
+            <option value="facebook">🎬 Facebook Reel</option>
+            <option value="link">🔗 Liên kết</option>
+          </select>
+          <select id="libSessionFilter"><option value="">Tất cả session</option></select>
+          <button class="btn" id="btnExportMd" title="Xuất danh sách đang lọc ra file Markdown">⬇️ Xuất .md</button>
+        </div>
+        <div class="resource-grid" id="libGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Cài đặt -->
+  <div class="modal-backdrop" id="settingsModal" hidden>
+    <div class="modal">
+      <div class="modal-head">
+        <h2>⚙️ Cài đặt trợ lý AI (ChatGPT)</h2>
+        <button class="btn ghost icon" data-close>✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="muted small">Nhập <b>OpenAI API key</b> để bật trợ lý tìm kiếm & giải đáp. Key được lưu ở máy chủ local của bạn (<code>server/data/settings.json</code>), không gửi đi đâu khác ngoài OpenAI.</p>
+        <label class="field">
+          <span>OpenAI API Key</span>
+          <input type="password" id="apiKeyInput" placeholder="sk-..." autocomplete="off" />
+        </label>
+        <label class="field">
+          <span>Model</span>
+          <select id="modelSelect">
+            <option value="gpt-4o-mini">gpt-4o-mini — rẻ, nhanh</option>
+            <option value="gpt-4o">gpt-4o — mạnh hơn</option>
+            <option value="gpt-4.1">gpt-4.1</option>
+            <option value="gpt-4.1-mini">gpt-4.1-mini</option>
+          </select>
+        </label>
+        <div class="settings-status" id="settingsStatus"></div>
+        <div class="modal-actions">
+          <button class="btn primary" id="saveSettings">Lưu</button>
+        </div>
+        <p class="muted small">Lấy key tại <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">platform.openai.com/api-keys</a>. Tính năng "Tìm kiếm web" cần model hỗ trợ công cụ web_search.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Thêm tài liệu -->
+  <div class="modal-backdrop" id="addResModal" hidden>
+    <div class="modal">
+      <div class="modal-head">
+        <h2>➕ Thêm tài liệu vào thư viện</h2>
+        <button class="btn ghost icon" data-close>✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="type-picker" id="typePicker">
+          <button data-type="text" class="active">📝 Text</button>
+          <button data-type="image">🖼️ Ảnh</button>
+          <button data-type="pdf">📄 PDF</button>
+          <button data-type="youtube">▶️ YouTube</button>
+          <button data-type="facebook">🎬 FB Reel</button>
+          <button data-type="link">🔗 Link</button>
+        </div>
+        <form id="addResForm">
+          <input type="hidden" name="type" value="text" />
+          <label class="field"><span>Tiêu đề</span>
+            <input type="text" name="title" placeholder="Đặt tên tài liệu (tùy chọn)" /></label>
+
+          <label class="field" data-when="youtube facebook link"><span>URL nguồn</span>
+            <input type="url" name="url" placeholder="Dán link vào đây" /></label>
+
+          <label class="field" data-when="text"><span>Nội dung</span>
+            <textarea name="note" rows="5" placeholder="Dán đoạn text / ghi chú…"></textarea></label>
+
+          <label class="field" data-when="image pdf"><span>Chọn file</span>
+            <input type="file" name="file" /></label>
+
+          <label class="field" data-when="youtube facebook link image pdf"><span>Ghi chú (tùy chọn)</span>
+            <textarea name="noteExtra" rows="2" placeholder="Vì sao tài liệu này hữu ích…"></textarea></label>
+
+          <label class="field"><span>Tags (phân cách bằng dấu phẩy)</span>
+            <input type="text" name="tags" placeholder="vd: hs-code, thị trường, mẫu email" /></label>
+
+          <div class="add-target muted small" id="addTarget"></div>
+          <div class="modal-actions">
+            <button type="submit" class="btn primary">Lưu vào thư viện</button>
+          </div>
+          <div class="form-error" id="addResError"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js" type="module"></script>
+</body>
+</html>
