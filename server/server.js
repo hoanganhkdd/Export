@@ -18,6 +18,7 @@ const APP_DATA = path.join(__dirname, 'data');            // nội dung đóng g
 const DATA_DIR = process.env.DATA_DIR || APP_DATA;        // thư mục GHI (đặt DATA_DIR để dùng ổ đĩa bền trên Render)
 const UPLOAD_DIR = path.join(DATA_DIR, 'uploads');
 const LIB_FILE = path.join(DATA_DIR, 'library.json');
+const KNOW_FILE = path.join(DATA_DIR, 'knowledge.json');
 const SETTINGS_FILE = path.join(DATA_DIR, 'settings.json');
 const CURRICULUM_FILE = path.join(APP_DATA, 'curriculum.json'); // luôn đọc từ bản đóng gói
 
@@ -49,8 +50,11 @@ function loadLibrary() { return readJSON(LIB_FILE, { resources: [] }); }
 function saveLibrary(lib) { writeJSON(LIB_FILE, lib); }
 function loadSettings() { return readJSON(SETTINGS_FILE, {}); }
 function saveSettings(s) { writeJSON(SETTINGS_FILE, s); }
+function loadKnowledge() { return readJSON(KNOW_FILE, { items: [] }); }
+function saveKnowledge(k) { writeJSON(KNOW_FILE, k); }
 
 if (!fs.existsSync(LIB_FILE)) saveLibrary({ resources: [] });
+if (!fs.existsSync(KNOW_FILE)) saveKnowledge({ items: [] });
 
 // ---------- Upload ----------
 const storage = multer.diskStorage({
@@ -421,6 +425,94 @@ function extractCitations(data) {
   const seen = new Set();
   return cites.filter(c => (seen.has(c.url) ? false : (seen.add(c.url), true)));
 }
+
+// ---------- Kho kiến thức song song (3 bảng: ví dụ thực tế · công cụ · hỏi AI) ----------
+app.get('/api/knowledge', (req, res) => {
+  const { session, kind } = req.query;
+  let items = loadKnowledge().items;
+  if (session) items = items.filter(k => k.sessionId === session);
+  if (kind) items = items.filter(k => k.kind === kind);
+  items = items.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  res.json({ items });
+});
+app.post('/api/knowledge', (req, res) => {
+  const { sessionId, kind, title, content, source, question } = req.body || {};
+  if (!['example', 'tool', 'qa'].includes(kind)) return res.status(400).json({ error: 'kind không hợp lệ' });
+  if (!content && !title) return res.status(400).json({ error: 'Thiếu nội dung' });
+  const k = loadKnowledge();
+  const item = {
+    id: crypto.randomBytes(8).toString('hex'),
+    sessionId: sessionId || 'general', kind,
+    title: (title || '').trim(), content: (content || '').trim(),
+    source: source || '', question: question || '', createdAt: Date.now()
+  };
+  k.items.push(item);
+  saveKnowledge(k);
+  res.json({ item });
+});
+app.delete('/api/knowledge/:id', (req, res) => {
+  const k = loadKnowledge();
+  const i = k.items.findIndex(x => x.id === req.params.id);
+  if (i === -1) return res.status(404).json({ error: 'Không tìm thấy' });
+  k.items.splice(i, 1);
+  saveKnowledge(k);
+  res.json({ ok: true });
+});
+
+function parseJsonArray(text) {
+  if (!text) return null;
+  let t = text.trim().replace(/^```(?:json)?/i, '').replace(/```$/, '').trim();
+  const a = t.indexOf('['), b = t.lastIndexOf(']');
+  if (a !== -1 && b !== -1) t = t.slice(a, b + 1);
+  try { const arr = JSON.parse(t); return Array.isArray(arr) ? arr : null; } catch { return null; }
+}
+
+// Sinh ứng viên ví dụ thực tế / công cụ (có nguồn) — CHƯA lưu, người dùng xác nhận sau
+app.post('/api/knowledge/generate', async (req, res) => {
+  const s = loadSettings();
+  const apiKey = s.openaiKey || process.env.OPENAI_API_KEY;
+  if (!apiKey) return res.status(400).json({ error: 'Chưa cấu hình OpenAI API key. Vào ⚙️ Cài đặt để thêm.' });
+  const { sessionId, kind } = req.body || {};
+  if (!['example', 'tool'].includes(kind)) return res.status(400).json({ error: 'kind phải là example hoặc tool' });
+  const model = s.model || process.env.OPENAI_MODEL || 'gpt-4o-mini';
+  const ctx = sessionContext(sessionId);
+
+  const ask = kind === 'example'
+    ? `Với chủ đề đang học: "${ctx}", hãy tìm 4 VÍ DỤ THỰC TẾ / tình huống / case thật liên quan (doanh nghiệp, thị trường, quy định, số liệu thật). Mỗi ví dụ ngắn gọn 2-3 câu tiếng Việt, KÈM nguồn URL thật.`
+    : `Với chủ đề đang học: "${ctx}", hãy liệt kê 5 CÔNG CỤ / THƯ VIỆN / WEBSITE thực tế hữu ích để làm phần này. Mỗi mục: tên công cụ, công dụng 1 câu tiếng Việt, và URL chính thức.`;
+  const prompt = `${ask}\nTrả về DUY NHẤT một mảng JSON hợp lệ, không thêm chữ nào khác, dạng:\n[{"title":"...","content":"...","source":"https://..."}]`;
+
+  try {
+    const r = await fetch('https://api.openai.com/v1/responses', {
+      method: 'POST', headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model, tools: [{ type: 'web_search' }],
+        input: [
+          { role: 'system', content: 'Bạn là chuyên gia xuất nhập khẩu. Luôn ưu tiên nguồn thật, URL thật. Trả lời đúng định dạng JSON được yêu cầu.' },
+          { role: 'user', content: prompt }
+        ]
+      })
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error?.message || 'Lỗi OpenAI');
+    const text = extractResponsesText(data);
+    let candidates = parseJsonArray(text);
+    if (!candidates) {
+      // fallback: trả nguyên văn thành 1 ứng viên
+      candidates = [{ title: kind === 'example' ? 'Ví dụ' : 'Công cụ', content: text, source: '' }];
+    }
+    // đính kèm citations nếu thiếu source
+    const cites = extractCitations(data);
+    candidates = candidates.map((c, i) => ({
+      title: String(c.title || '').slice(0, 200),
+      content: String(c.content || c.detail || '').slice(0, 1200),
+      source: c.source || c.url || cites[i]?.url || ''
+    })).filter(c => c.content || c.title);
+    res.json({ candidates, kind });
+  } catch (e) {
+    res.status(502).json({ error: String(e.message || e) });
+  }
+});
 
 // ---------- Static ----------
 app.use('/uploads', express.static(UPLOAD_DIR));

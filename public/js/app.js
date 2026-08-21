@@ -123,10 +123,12 @@ function renderHome() {
         ${statCard(totalRes, 'Tài liệu', 'trong thư viện')}
       </div>
     </section>
+    <div id="planMount"></div>
     <div class="home-modules" id="homeModules"></div>`;
 
   $('#homeContinue').onclick = () => openSession(next.id);
   $('#homeLibrary').onclick = openLibrary;
+  renderPlanCard($('#planMount'), done, total);
 
   const wrap = $('#homeModules');
   for (const [mod, list] of Object.entries(groups)) {
@@ -154,6 +156,87 @@ function renderHome() {
 function statCard(big, label, sub) {
   return `<div class="stat-card"><div class="stat-big">${esc(String(big))}</div>
     <div class="stat-label">${esc(label)}</div><div class="stat-sub muted small">${esc(sub)}</div></div>`;
+}
+
+// ---------- Kế hoạch học tập + phiên đào sâu (localStorage) ----------
+const timer = { running: false, startTs: 0, iv: null };
+function getPlan() { return Object.assign({ perWeek: 1, dailyMin: 60 }, JSON.parse(localStorage.getItem('exp_plan') || '{}')); }
+function savePlan(p) { localStorage.setItem('exp_plan', JSON.stringify(p)); }
+function getLog() { return JSON.parse(localStorage.getItem('exp_studylog') || '{}'); }
+function saveLog(l) { localStorage.setItem('exp_studylog', JSON.stringify(l)); }
+function todayKey() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
+function addStudyMinutes(min) { const l = getLog(); l[todayKey()] = (l[todayKey()] || 0) + min; saveLog(l); }
+function computeStreak() {
+  const l = getLog(); let n = 0; const d = new Date();
+  for (;;) {
+    const k = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    if ((l[k] || 0) > 0) { n++; d.setDate(d.getDate() - 1); } else break;
+  }
+  return n;
+}
+function renderPlanCard(mount, done, total) {
+  clearInterval(timer.iv); timer.running = false; timer.startTs = 0;
+  const plan = getPlan();
+  const remaining = total - done;
+  const weeksLeft = plan.perWeek > 0 ? Math.ceil(remaining / plan.perWeek) : '—';
+  const finish = new Date(); finish.setDate(finish.getDate() + (typeof weeksLeft === 'number' ? weeksLeft * 7 : 0));
+  const weekStages = state.sessions.filter(s => !state.progress[s.id]).slice(0, plan.perWeek);
+  const todayMin = Math.round(getLog()[todayKey()] || 0);
+  const streak = computeStreak();
+
+  mount.innerHTML = `
+  <section class="plan-card">
+    <div class="plan-col plan-goal">
+      <div class="deep-h">🎯 Mục tiêu học tập</div>
+      <label class="plan-field">Mỗi tuần học
+        <input type="number" min="1" max="23" id="planPerWeek" value="${plan.perWeek}"> giai đoạn</label>
+      <label class="plan-field">Đào sâu mỗi ngày
+        <input type="number" min="10" max="480" step="5" id="planDaily" value="${plan.dailyMin}"> phút</label>
+      <div class="plan-est muted small">Còn <b>${remaining}</b> giai đoạn · ~<b>${weeksLeft}</b> tuần · dự kiến xong <b>${finish.toLocaleDateString('vi-VN')}</b></div>
+      <div class="plan-week">
+        <div class="muted small">📌 Tuần này nên học:</div>
+        <div class="plan-chips" id="planChips">${weekStages.length ? weekStages.map(s => `<button class="home-session" data-go="${s.id}"><span class="hs-title">${esc(s.title_vi)}</span></button>`).join('') : '<span class="muted small">Đã hoàn thành tất cả 🎉</span>'}</div>
+      </div>
+    </div>
+    <div class="plan-col plan-focus">
+      <div class="deep-h">⏱️ Phiên đào sâu hôm nay</div>
+      <div class="timer-display" id="timerDisplay">00:00</div>
+      <div class="timer-actions">
+        <button class="btn primary" id="timerToggle">▶ Bắt đầu</button>
+        <button class="btn" id="timerReset" title="Lưu & kết thúc phiên">■ Kết thúc</button>
+      </div>
+      <div class="plan-today">
+        <div class="today-bar"><span id="todayFill" style="width:${Math.min(100, todayMin / plan.dailyMin * 100)}%"></span></div>
+        <div class="muted small">Hôm nay: <b id="todayMin">${todayMin}</b>/${plan.dailyMin} phút · 🔥 chuỗi <b>${streak}</b> ngày</div>
+      </div>
+    </div>
+  </section>`;
+
+  const perWeek = $('#planPerWeek', mount), daily = $('#planDaily', mount);
+  const persist = () => { const p = getPlan(); p.perWeek = Math.max(1, +perWeek.value || 1); p.dailyMin = Math.max(10, +daily.value || 60); savePlan(p); renderPlanCard(mount, done, total); };
+  perWeek.onchange = persist; daily.onchange = persist;
+  $$('#planChips [data-go]', mount).forEach(b => b.onclick = () => openSession(b.dataset.go));
+
+  const disp = $('#timerDisplay', mount), toggle = $('#timerToggle', mount);
+  const tick = () => {
+    const sec = Math.floor((Date.now() - timer.startTs) / 1000);
+    disp.textContent = `${String(Math.floor(sec / 60)).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
+  };
+  const flush = () => {
+    if (!timer.running) return 0;
+    const min = (Date.now() - timer.startTs) / 60000;
+    addStudyMinutes(min); timer.running = false; clearInterval(timer.iv); return min;
+  };
+  toggle.onclick = () => {
+    if (!timer.running) { timer.running = true; timer.startTs = Date.now(); timer.iv = setInterval(tick, 1000); tick(); toggle.textContent = '⏸ Tạm dừng'; toggle.classList.remove('primary'); }
+    else { flush(); toggle.textContent = '▶ Tiếp tục'; toggle.classList.add('primary'); refreshToday(mount, plan); }
+  };
+  $('#timerReset', mount).onclick = () => { flush(); disp.textContent = '00:00'; toggle.textContent = '▶ Bắt đầu'; toggle.classList.add('primary'); refreshToday(mount, plan); };
+}
+function refreshToday(mount, plan) {
+  const todayMin = Math.round(getLog()[todayKey()] || 0);
+  const tm = $('#todayMin', mount); if (tm) tm.textContent = todayMin;
+  const tf = $('#todayFill', mount); if (tf) tf.style.width = Math.min(100, todayMin / plan.dailyMin * 100) + '%';
 }
 
 // ---------- Open a session ----------
@@ -186,6 +269,7 @@ function renderSession() {
   const tabs = el('div', 'tabs');
   tabs.innerHTML = `
     <button class="tab ${state.tab === 'lesson' ? 'active' : ''}" data-tab="lesson">📖 Bài học</button>
+    <button class="tab ${state.tab === 'deep' ? 'active' : ''}" data-tab="deep">🧠 Đào sâu</button>
     <button class="tab ${state.tab === 'library' ? 'active' : ''}" data-tab="library">📚 Thư viện<span class="tab-badge" id="libTabCount">${cnt}</span></button>
     <button class="tab ${state.tab === 'ai' ? 'active' : ''}" data-tab="ai">🤖 Hỏi AI</button>`;
   main.append(tabs);
@@ -201,12 +285,19 @@ function renderSession() {
   };
 
   if (state.tab === 'lesson') renderLesson(body, s);
+  else if (state.tab === 'deep') renderDeepTab(body, s);
   else if (state.tab === 'library') renderLibraryTab(body, s);
   else renderAITab(body, s);
 }
 
 // ---------- Lesson ----------
 function renderLesson(body, s) {
+  const bar = el('div', 'listen-bar');
+  bar.innerHTML = `<button class="btn primary" id="btnListen">🎧 Nghe bài (chế độ ngồi xe)</button>
+    <span class="muted small">Đọc to nội dung bài học — rảnh tay khi đi đường.</span>`;
+  body.append(bar);
+  $('#btnListen', bar).onclick = () => startListen(s);
+
   for (const sl of s.slides) {
     const card = renderSlide(sl);
     if (card) body.append(card);
@@ -458,6 +549,219 @@ async function loadLibraryGrid() {
   const items = await fetchResources(params);
   libGridItems = items;
   renderResourceCards($('#libGrid'), items, { showSession: true });
+}
+
+// ================= ĐÀO SÂU: 3 bảng kiến thức song song =================
+async function fetchKnowledge(session) {
+  const d = await fetch('/api/knowledge?session=' + encodeURIComponent(session)).then(r => r.json()).catch(() => ({ items: [] }));
+  return d.items || [];
+}
+async function saveKnowledgeItem(payload) {
+  const r = await fetch('/api/knowledge', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+  const d = await r.json(); if (!r.ok) throw new Error(d.error || 'Lỗi lưu'); return d.item;
+}
+
+async function renderDeepTab(body, s) {
+  body.innerHTML = `<div class="muted small deep-intro">Ba bảng song song để đào sâu <b>${esc(s.title_vi)}</b>. Kết quả AI có nguồn — bạn <b>💾 Lưu</b> vào kho kiến thức hoặc <b>✕ Bỏ</b>.</div>`;
+  const grid = el('div', 'deep-grid');
+  body.append(grid);
+  const all = await fetchKnowledge(s.id);
+  grid.append(genPanel(s, 'example', '🌍 Ví dụ thực tế', 'Case/tình huống thật, trích nguồn web', all.filter(k => k.kind === 'example')));
+  grid.append(genPanel(s, 'tool', '🧰 Công cụ / Thư viện', 'Công cụ, website nên dùng cho phần này', all.filter(k => k.kind === 'tool')));
+  grid.append(qaPanel(s, all.filter(k => k.kind === 'qa')));
+}
+
+function savedRow(item, savedBox) {
+  const row = el('div', 'know-row');
+  row.innerHTML = `
+    ${item.kind === 'qa' && item.question ? `<div class="know-q">❓ ${esc(item.question)}</div>` : ''}
+    ${item.title ? `<div class="know-title">${esc(item.title)}</div>` : ''}
+    <div class="know-content">${formatMarkdown(item.content)}</div>
+    <div class="know-foot">
+      ${item.source ? `<a href="${esc(item.source)}" target="_blank" rel="noopener" class="res-src">🔗 Nguồn</a>` : '<span></span>'}
+      <button class="btn danger-text" title="Xóa khỏi kho">🗑</button>
+    </div>`;
+  $('.danger-text', row).onclick = async () => {
+    if (!confirm('Xóa mục kiến thức này?')) return;
+    await fetch('/api/knowledge/' + item.id, { method: 'DELETE' });
+    row.remove();
+  };
+  return row;
+}
+
+function candidateCard(cand, kind, s, savedBox, extra = {}) {
+  const card = el('div', 'cand-card');
+  card.innerHTML = `
+    ${extra.question ? `<div class="know-q">❓ ${esc(extra.question)}</div>` : ''}
+    ${cand.title ? `<div class="know-title">${esc(cand.title)}</div>` : ''}
+    <div class="know-content">${formatMarkdown(cand.content || '')}</div>
+    <div class="know-foot">
+      ${cand.source ? `<a href="${esc(cand.source)}" target="_blank" rel="noopener" class="res-src">🔗 Nguồn</a>` : '<span class="muted small">không có nguồn</span>'}
+      <span class="cand-actions">
+        <button class="btn sm primary act-save">💾 Lưu</button>
+        <button class="btn sm act-drop">✕ Bỏ</button>
+      </span>
+    </div>`;
+  $('.act-drop', card).onclick = () => card.remove();
+  $('.act-save', card).onclick = async () => {
+    $('.act-save', card).disabled = true;
+    try {
+      const item = await saveKnowledgeItem({ sessionId: s.id, kind, title: cand.title || '', content: cand.content || '', source: cand.source || '', question: extra.question || '' });
+      savedBox.prepend(savedRow(item, savedBox));
+      card.remove();
+    } catch (e) { alert(e.message); $('.act-save', card).disabled = false; }
+  };
+  return card;
+}
+
+function genPanel(s, kind, title, sub, saved) {
+  const panel = el('div', 'deep-panel');
+  panel.innerHTML = `<div class="deep-h">${title}<span class="muted small">${sub}</span></div>
+    <button class="btn sm gen-btn">✨ Gợi ý bằng AI (có nguồn)</button>
+    <div class="cand-area"></div>
+    <div class="saved-area"></div>`;
+  const savedBox = $('.saved-area', panel), candBox = $('.cand-area', panel);
+  saved.forEach(it => savedBox.append(savedRow(it, savedBox)));
+  $('.gen-btn', panel).onclick = async () => {
+    candBox.innerHTML = `<div class="insight-loading">⏳ AI đang tìm ${kind === 'example' ? 'ví dụ thực tế' : 'công cụ'} có nguồn…</div>`;
+    try {
+      const r = await fetch('/api/knowledge/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: s.id, kind }) });
+      const d = await r.json();
+      candBox.innerHTML = '';
+      if (!r.ok) { candBox.innerHTML = `<div class="insight-error">⚠️ ${esc(d.error)}</div>`; return; }
+      if (!d.candidates?.length) { candBox.innerHTML = `<div class="muted small">Không có gợi ý.</div>`; return; }
+      d.candidates.forEach(c => candBox.append(candidateCard(c, kind, s, savedBox)));
+    } catch { candBox.innerHTML = `<div class="insight-error">⚠️ Không kết nối được máy chủ.</div>`; }
+  };
+  return panel;
+}
+
+function qaPanel(s, saved) {
+  const panel = el('div', 'deep-panel');
+  panel.innerHTML = `<div class="deep-h">🤔 Hỏi AI tra cứu<span class="muted small">Tra cứu theo đúng ngữ cảnh bài học</span></div>
+    <textarea class="qa-input" rows="2" placeholder="Nhập câu hỏi tra cứu…"></textarea>
+    <label class="switch small"><input type="checkbox" class="qa-web"> 🔎 Tìm web (kèm nguồn)</label>
+    <button class="btn sm qa-ask">🔎 Tra cứu</button>
+    <div class="cand-area"></div>
+    <div class="saved-area"></div>`;
+  const savedBox = $('.saved-area', panel), candBox = $('.cand-area', panel);
+  saved.forEach(it => savedBox.append(savedRow(it, savedBox)));
+  const ask = async () => {
+    const q = $('.qa-input', panel).value.trim();
+    if (!q) return;
+    candBox.innerHTML = `<div class="insight-loading">⏳ Đang tra cứu…</div>`;
+    try {
+      const r = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: q, context: `${s.title_vi} (${s.title_en}). ${s.subtitle}`, webSearch: $('.qa-web', panel).checked }) });
+      const d = await r.json();
+      candBox.innerHTML = '';
+      if (!r.ok) { candBox.innerHTML = `<div class="insight-error">⚠️ ${esc(d.error)}</div>`; return; }
+      const src = d.citations?.[0]?.url || '';
+      candBox.append(candidateCard({ title: '', content: d.answer || '', source: src }, 'qa', s, savedBox, { question: q }));
+    } catch { candBox.innerHTML = `<div class="insight-error">⚠️ Không kết nối được máy chủ.</div>`; }
+  };
+  $('.qa-ask', panel).onclick = ask;
+  $('.qa-input', panel).addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(); } });
+  return panel;
+}
+
+// ================= NGHE BÀI (Text-to-Speech, chế độ ngồi xe) =================
+const player = { chunks: [], idx: 0, playing: false, session: null, rate: 1, voice: null, autoNext: true, keepAlive: null };
+const _viRe = /[àáảãạăắằẳẵặâấầẩẫậèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵđ]/i;
+function buildSpeechChunks(s) {
+  const enSub = new Set(['What exactly you produce', 'The ordered steps — do not skip', 'Practical technique', 'Free / low-cost tools']);
+  const out = [`${s.title_vi}. ${s.subtitle}`];
+  for (const sl of s.slides) {
+    for (let ln of (sl.lines || [])) {
+      ln = ln.trim();
+      if (!ln || /^\d{1,2}$/.test(ln) || enSub.has(ln)) continue;
+      if (ln.includes(' | ')) ln = ln.replace(/\s*\|\s*/g, ', ');
+      if (!_viRe.test(ln) && ln.length < 60) continue; // bỏ gloss tiếng Anh ngắn
+      ln.split(/(?<=[.!?…])\s+/).forEach(x => { const t = x.trim(); if (t.length > 1) out.push(t); });
+    }
+  }
+  return out;
+}
+function nextSessionId(id) {
+  const i = state.sessions.findIndex(x => x.id === id);
+  return i >= 0 && i < state.sessions.length - 1 ? state.sessions[i + 1].id : null;
+}
+function startListen(s) {
+  if (!('speechSynthesis' in window)) { alert('Trình duyệt không hỗ trợ đọc giọng nói. Hãy dùng Chrome/Edge.'); return; }
+  player.session = s; player.chunks = buildSpeechChunks(s); player.idx = 0;
+  ensurePlayerUI(); $('#miniPlayer').classList.add('show');
+  playSpeech();
+}
+function speakCurrent() {
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(player.chunks[player.idx]);
+  u.lang = 'vi-VN'; u.rate = player.rate;
+  if (player.voice) u.voice = player.voice;
+  u.onend = () => { if (player.playing) nextSpeech(true); };
+  window.speechSynthesis.speak(u);
+  updatePlayerUI();
+}
+function playSpeech() {
+  player.playing = true;
+  if (window.speechSynthesis.paused) window.speechSynthesis.resume(); else speakCurrent();
+  clearInterval(player.keepAlive);
+  player.keepAlive = setInterval(() => { if (player.playing && !window.speechSynthesis.speaking) return; if (player.playing) window.speechSynthesis.resume(); }, 8000);
+  setPlayIcon();
+}
+function pauseSpeech() { player.playing = false; window.speechSynthesis.pause(); clearInterval(player.keepAlive); setPlayIcon(); }
+function stopSpeech() { player.playing = false; window.speechSynthesis.cancel(); clearInterval(player.keepAlive); $('#miniPlayer')?.classList.remove('show'); }
+function nextSpeech(auto) {
+  if (player.idx < player.chunks.length - 1) { player.idx++; if (player.playing) speakCurrent(); else updatePlayerUI(); }
+  else {
+    const ni = player.autoNext ? nextSessionId(player.session.id) : null;
+    if (ni) { const ns = state.byId[ni]; player.session = ns; player.chunks = buildSpeechChunks(ns); player.idx = 0; if (player.playing) speakCurrent(); else updatePlayerUI(); }
+    else { player.playing = false; window.speechSynthesis.cancel(); clearInterval(player.keepAlive); setPlayIcon(); }
+  }
+}
+function prevSpeech() { if (player.idx > 0) { player.idx--; if (player.playing) speakCurrent(); else updatePlayerUI(); } }
+function setPlayIcon() { const b = $('#pp'); if (b) b.textContent = player.playing ? '⏸' : '▶️'; }
+function updatePlayerUI() {
+  const t = $('#playerText'); if (t) t.textContent = player.chunks[player.idx] || '';
+  const meta = $('#playerMeta'); if (meta) meta.textContent = `${player.session.title_vi} · ${player.idx + 1}/${player.chunks.length}`;
+}
+function loadVoices() {
+  const sel = $('#voiceSel'); if (!sel) return;
+  const voices = window.speechSynthesis.getVoices();
+  const vi = voices.filter(v => /vi/i.test(v.lang));
+  const list = (vi.length ? vi : voices);
+  sel.innerHTML = list.map((v, i) => `<option value="${voices.indexOf(v)}">${esc(v.name)} (${v.lang})</option>`).join('') || '<option>Mặc định</option>';
+  if (vi.length && !player.voice) player.voice = vi[0];
+}
+function ensurePlayerUI() {
+  if ($('#miniPlayer')) return;
+  const p = el('div', 'mini-player'); p.id = 'miniPlayer';
+  p.innerHTML = `
+    <div class="mp-main">
+      <div class="mp-meta" id="playerMeta"></div>
+      <div class="mp-text" id="playerText"></div>
+    </div>
+    <div class="mp-ctrl">
+      <button class="mp-btn" id="mpPrev" title="Câu trước">⏮</button>
+      <button class="mp-btn big" id="pp" title="Phát/Dừng">▶️</button>
+      <button class="mp-btn" id="mpNext" title="Câu sau">⏭</button>
+      <select class="mp-sel" id="rateSel" title="Tốc độ">
+        <option value="0.8">0.8×</option><option value="1" selected>1×</option>
+        <option value="1.2">1.2×</option><option value="1.5">1.5×</option>
+      </select>
+      <select class="mp-sel" id="voiceSel" title="Giọng đọc"></select>
+      <label class="switch small" title="Tự đọc tiếp session sau"><input type="checkbox" id="autoNext" checked> tiếp</label>
+      <button class="mp-btn" id="mpClose" title="Đóng">✕</button>
+    </div>`;
+  document.body.append(p);
+  $('#pp', p).onclick = () => player.playing ? pauseSpeech() : playSpeech();
+  $('#mpPrev', p).onclick = prevSpeech;
+  $('#mpNext', p).onclick = () => nextSpeech(false);
+  $('#mpClose', p).onclick = stopSpeech;
+  $('#rateSel', p).onchange = e => { player.rate = +e.target.value; if (player.playing) speakCurrent(); };
+  $('#autoNext', p).onchange = e => player.autoNext = e.target.checked;
+  $('#voiceSel', p).onchange = e => { const vs = window.speechSynthesis.getVoices(); player.voice = vs[+e.target.value] || null; if (player.playing) speakCurrent(); };
+  loadVoices();
+  if (window.speechSynthesis.onvoiceschanged !== undefined) window.speechSynthesis.onvoiceschanged = loadVoices;
 }
 
 // ---------- Export Markdown ----------

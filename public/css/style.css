@@ -158,6 +158,57 @@ code { background: var(--surface-2); padding: 1px 5px; border-radius: 5px; font-
 .home-session .hs-title { flex: 1; }
 .home-session .hs-cnt { font-size: .74rem; color: var(--muted); }
 
+/* ---- Kế hoạch học tập ---- */
+.plan-card { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 15px; padding: 18px 20px; box-shadow: var(--shadow); margin-bottom: 24px; }
+.plan-col { min-width: 0; }
+.plan-focus { border-left: 1px solid var(--border); padding-left: 18px; }
+.deep-h { font-weight: 700; font-size: 1rem; margin-bottom: 10px; display: flex; flex-direction: column; }
+.deep-h .small { font-weight: 400; }
+.plan-field { display: flex; align-items: center; gap: 8px; font-size: .9rem; margin-bottom: 8px; color: var(--text-2); }
+.plan-field input { width: 66px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-family: inherit; }
+.plan-est { margin: 8px 0 12px; }
+.plan-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.plan-chips .home-session { width: auto; }
+.timer-display { font-size: 2.6rem; font-weight: 800; text-align: center; font-variant-numeric: tabular-nums; color: var(--brand); letter-spacing: 1px; margin: 4px 0; }
+.timer-actions { display: flex; gap: 8px; justify-content: center; margin-bottom: 12px; }
+.today-bar { height: 8px; background: var(--surface-2); border-radius: 99px; overflow: hidden; margin-bottom: 5px; }
+.today-bar span { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), #f59e42); transition: width .4s; }
+
+/* ---- Đào sâu: 3 bảng ---- */
+.deep-intro { margin-bottom: 14px; }
+.deep-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+.deep-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; }
+.deep-panel .gen-btn, .deep-panel .qa-ask { align-self: flex-start; }
+.qa-input { width: 100%; padding: 9px 11px; border: 1px solid var(--border); border-radius: 9px; background: var(--bg); color: var(--text); font-family: inherit; font-size: .9rem; resize: vertical; }
+.cand-area, .saved-area { display: flex; flex-direction: column; gap: 10px; }
+.cand-card { background: var(--accent-soft); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+.know-row { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+.know-q { font-weight: 600; font-size: .86rem; color: var(--brand); margin-bottom: 4px; }
+.know-title { font-weight: 600; font-size: .9rem; margin-bottom: 3px; }
+.know-content { font-size: .86rem; color: var(--text); }
+.know-content p { margin: 4px 0; } .know-content ul { margin: 4px 0; padding-left: 18px; }
+.know-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
+.cand-actions { display: flex; gap: 6px; }
+.switch.small { font-size: .82rem; }
+
+/* ---- Nghe bài (mini player) ---- */
+.listen-bar { display: flex; align-items: center; gap: 12px; background: var(--ok-soft); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; flex-wrap: wrap; }
+.mini-player { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%) translateY(140%); width: min(720px, calc(100% - 24px)); background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 8px 40px rgba(0,0,0,.25); padding: 12px 16px; z-index: 70; transition: transform .3s; }
+.mini-player.show { transform: translateX(-50%) translateY(0); }
+.mp-meta { font-size: .74rem; color: var(--muted); font-weight: 600; }
+.mp-text { font-size: 1.02rem; line-height: 1.4; margin: 4px 0 10px; min-height: 2.6em; }
+.mp-ctrl { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.mp-btn { border: 1px solid var(--border); background: var(--surface-2); color: var(--text); border-radius: 9px; padding: 6px 11px; cursor: pointer; font-size: 1rem; }
+.mp-btn:hover { background: var(--border); }
+.mp-btn.big { background: var(--brand); color: #fff; border-color: var(--brand); font-size: 1.1rem; padding: 7px 15px; }
+.mp-sel { padding: 6px 8px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-family: inherit; font-size: .82rem; max-width: 150px; }
+.mp-ctrl .switch { margin-left: auto; }
+
+@media (max-width: 720px) {
+  .plan-card { grid-template-columns: 1fr; }
+  .plan-focus { border-left: none; border-top: 1px solid var(--border); padding-left: 0; padding-top: 14px; }
+}
+
 /* ---- Session header ---- */
 .session-head { margin-bottom: 18px; }
 .session-badge {

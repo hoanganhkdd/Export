@@ -6,3 +6,6 @@ server/data/settings.json
 
 # Log cục bộ
 *.log
+
+# Kho kiến thức runtime
+server/data/knowledge.json
