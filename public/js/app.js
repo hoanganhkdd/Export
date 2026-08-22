@@ -593,9 +593,19 @@ async function renderDeepTab(body, s) {
   const grid = el('div', 'deep-grid');
   body.append(grid);
   const all = await fetchKnowledge(s.id);
+  grid.append(lessonPanel(s));
   grid.append(genPanel(s, 'example', '🌍 Ví dụ thực tế', 'Case/tình huống thật, trích nguồn web', all.filter(k => k.kind === 'example')));
   grid.append(genPanel(s, 'tool', '🧰 Công cụ / Thư viện', 'Công cụ, website nên dùng cho phần này', all.filter(k => k.kind === 'tool')));
   grid.append(qaPanel(s, all.filter(k => k.kind === 'qa')));
+}
+
+function lessonPanel(s) {
+  const panel = el('div', 'deep-panel lesson-panel');
+  panel.innerHTML = `<div class="deep-h">📖 Nội dung bài học<span class="muted small">Đối chiếu kiến thức ngay khi đào sâu</span></div>`;
+  const scroll = el('div', 'lesson-scroll');
+  for (const sl of s.slides) { const c = renderSlide(sl); if (c) scroll.append(c); }
+  panel.append(scroll);
+  return panel;
 }
 
 function savedRow(item, savedBox) {

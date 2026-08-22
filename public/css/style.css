@@ -181,6 +181,12 @@ code { background: var(--surface-2); padding: 1px 5px; border-radius: 5px; font-
 .deep-panel .gen-btn, .deep-panel .qa-ask { align-self: flex-start; }
 .qa-input { width: 100%; padding: 9px 11px; border: 1px solid var(--border); border-radius: 9px; background: var(--bg); color: var(--text); font-family: inherit; font-size: .9rem; resize: vertical; }
 .cand-area, .saved-area { display: flex; flex-direction: column; gap: 10px; }
+.lesson-panel { grid-row: span 2; }
+.lesson-scroll { max-height: 620px; overflow-y: auto; padding-right: 4px; display: flex; flex-direction: column; gap: 10px; }
+.lesson-scroll .slide-card { padding: 12px 14px; margin-bottom: 0; box-shadow: none; }
+.lesson-scroll .slide-h { font-size: 1rem; }
+.lesson-scroll .slide-body { font-size: .84rem; }
+.lesson-scroll .slide-num { font-size: .66rem; }
 .cand-card { background: var(--accent-soft); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
 .know-row { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
 .know-q { font-weight: 600; font-size: .86rem; color: var(--brand); margin-bottom: 4px; }

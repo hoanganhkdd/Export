@@ -9,3 +9,6 @@ server/data/settings.json
 
 # Kho kiến thức runtime
 server/data/knowledge.json
+
+# Cấu hình cá nhân Claude Code
+.claude/settings.local.json
