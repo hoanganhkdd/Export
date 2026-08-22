@@ -19,6 +19,7 @@ const DATA_DIR = process.env.DATA_DIR || APP_DATA;        // thư mục GHI (đ�
 const UPLOAD_DIR = path.join(DATA_DIR, 'uploads');
 const LIB_FILE = path.join(DATA_DIR, 'library.json');
 const KNOW_FILE = path.join(DATA_DIR, 'knowledge.json');
+const STATE_FILE = path.join(DATA_DIR, 'state.json');
 const SETTINGS_FILE = path.join(DATA_DIR, 'settings.json');
 const CURRICULUM_FILE = path.join(APP_DATA, 'curriculum.json'); // luôn đọc từ bản đóng gói
 
@@ -78,10 +79,12 @@ app.get('/api/curriculum', (_req, res) => {
 // ---------- Thư viện tài liệu ----------
 // GET tất cả (hỗ trợ ?session=s1, ?type=youtube, ?q=từ khóa)
 app.get('/api/resources', (req, res) => {
-  const { session, type, q } = req.query;
+  const { session, type, q, kind } = req.query;
   let items = loadLibrary().resources;
   if (session) items = items.filter(r => r.sessionId === session);
   if (type) items = items.filter(r => r.type === type);
+  if (kind === 'none') items = items.filter(r => !r.kind);
+  else if (kind) items = items.filter(r => r.kind === kind);
   if (q) {
     const s = String(q).toLowerCase();
     items = items.filter(r =>
@@ -96,7 +99,7 @@ app.get('/api/resources', (req, res) => {
 
 // Thêm tài liệu dạng link/text (JSON)
 app.post('/api/resources', (req, res) => {
-  const { sessionId, type, title, url, note, tags } = req.body || {};
+  const { sessionId, type, title, url, note, tags, kind, question } = req.body || {};
   const allowed = ['text', 'youtube', 'facebook', 'link', 'pdf', 'image'];
   if (!allowed.includes(type)) return res.status(400).json({ error: 'type không hợp lệ' });
   if ((type === 'youtube' || type === 'facebook' || type === 'link') && !url)
@@ -109,6 +112,8 @@ app.post('/api/resources', (req, res) => {
     id: crypto.randomBytes(8).toString('hex'),
     sessionId: sessionId || 'general',
     type,
+    kind: kind || null,               // null=tài liệu thường; example|tool|qa|quiz=nội dung đào sâu/kiểm tra
+    question: question || '',
     title: (title || '').trim() || defaultTitle(type, url),
     url: url || '',
     note: note || '',
@@ -512,6 +517,86 @@ app.post('/api/knowledge/generate', async (req, res) => {
   } catch (e) {
     res.status(502).json({ error: String(e.message || e) });
   }
+});
+
+// ---------- Đồng bộ tiến độ/mục tiêu giữa các thiết bị ----------
+app.get('/api/state', (_req, res) => res.json(readJSON(STATE_FILE, { progress: {}, plan: null, studylog: {} })));
+app.post('/api/state', (req, res) => {
+  const cur = readJSON(STATE_FILE, { progress: {}, plan: null, studylog: {} });
+  const b = req.body || {};
+  const next = {
+    progress: b.progress && typeof b.progress === 'object' ? b.progress : cur.progress,
+    plan: b.plan !== undefined ? b.plan : cur.plan,
+    studylog: b.studylog && typeof b.studylog === 'object' ? b.studylog : cur.studylog,
+    updatedAt: Date.now()
+  };
+  writeJSON(STATE_FILE, next);
+  res.json({ ok: true, updatedAt: next.updatedAt });
+});
+
+// ---------- Kiểm tra / Thu hoạch (AI ra đề + chấm) ----------
+app.post('/api/quiz/generate', async (req, res) => {
+  const s = loadSettings();
+  const apiKey = s.openaiKey || process.env.OPENAI_API_KEY;
+  if (!apiKey) return res.status(400).json({ error: 'Chưa cấu hình OpenAI API key. Vào ⚙️ Cài đặt để thêm.' });
+  const { sessionId, numMC = 5, numEssay = 2 } = req.body || {};
+  const model = s.model || process.env.OPENAI_MODEL || 'gpt-4o-mini';
+  const ctx = sessionContext(sessionId);
+  const prompt = `Dựa trên nội dung bài học phần: "${ctx}", hãy soạn một bài KIỂM TRA THU HOẠCH bằng tiếng Việt gồm:
+- ${numMC} câu TRẮC NGHIỆM (mỗi câu 4 lựa chọn, chỉ 1 đúng).
+- ${numEssay} câu TỰ LUẬN (câu hỏi mở, yêu cầu vận dụng).
+Trả về DUY NHẤT một JSON hợp lệ, không thêm chữ nào khác, dạng:
+{"mc":[{"q":"...","options":["A","B","C","D"],"answer":0,"explain":"giải thích ngắn"}],"essay":[{"q":"...","guide":"gợi ý ý chính cần có"}]}`;
+  try {
+    const r = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST', headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model, temperature: 0.4,
+        messages: [
+          { role: 'system', content: 'Bạn là giáo viên ra đề kiểm tra. Chỉ trả về JSON đúng định dạng yêu cầu.' },
+          { role: 'user', content: prompt }
+        ]
+      })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error?.message || 'Lỗi OpenAI');
+    let txt = (d.choices?.[0]?.message?.content || '').trim().replace(/^```(?:json)?/i, '').replace(/```$/, '').trim();
+    const a = txt.indexOf('{'), b = txt.lastIndexOf('}');
+    if (a !== -1 && b !== -1) txt = txt.slice(a, b + 1);
+    const quiz = JSON.parse(txt);
+    res.json({ quiz });
+  } catch (e) { res.status(502).json({ error: String(e.message || e) }); }
+});
+
+app.post('/api/quiz/grade', async (req, res) => {
+  const s = loadSettings();
+  const apiKey = s.openaiKey || process.env.OPENAI_API_KEY;
+  if (!apiKey) return res.status(400).json({ error: 'Chưa cấu hình OpenAI API key.' });
+  const { sessionId, essays } = req.body || {}; // essays: [{q, guide, answer}]
+  if (!Array.isArray(essays) || !essays.length) return res.json({ results: [] });
+  const model = s.model || process.env.OPENAI_MODEL || 'gpt-4o-mini';
+  const ctx = sessionContext(sessionId);
+  const prompt = `Chấm các câu TỰ LUẬN sau (phần học: "${ctx}"). Với mỗi câu, cho điểm 0-10 và nhận xét ngắn gọn, chỉ ra điều còn thiếu.
+Dữ liệu: ${JSON.stringify(essays)}
+Trả về DUY NHẤT JSON: {"results":[{"score":8,"feedback":"..."}]} theo đúng thứ tự.`;
+  try {
+    const r = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST', headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model, temperature: 0.2,
+        messages: [
+          { role: 'system', content: 'Bạn là giám khảo công tâm. Chỉ trả JSON đúng định dạng.' },
+          { role: 'user', content: prompt }
+        ]
+      })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error?.message || 'Lỗi OpenAI');
+    let txt = (d.choices?.[0]?.message?.content || '').trim().replace(/^```(?:json)?/i, '').replace(/```$/, '').trim();
+    const a = txt.indexOf('{'), b = txt.lastIndexOf('}');
+    if (a !== -1 && b !== -1) txt = txt.slice(a, b + 1);
+    res.json(JSON.parse(txt));
+  } catch (e) { res.status(502).json({ error: String(e.message || e) }); }
 });
 
 // ---------- Static ----------

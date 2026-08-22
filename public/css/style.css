@@ -174,8 +174,20 @@ code { background: var(--surface-2); padding: 1px 5px; border-radius: 5px; font-
 .today-bar { height: 8px; background: var(--surface-2); border-radius: 99px; overflow: hidden; margin-bottom: 5px; }
 .today-bar span { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), #f59e42); transition: width .4s; }
 
-/* ---- Đào sâu: 3 bảng ---- */
+/* ---- Đào sâu: bảng + kiểm tra ---- */
 .deep-intro { margin-bottom: 14px; }
+.deep-topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.quiz-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; box-shadow: var(--shadow); }
+.quiz-q { margin-bottom: 16px; }
+.quiz-qtext { font-weight: 600; margin-bottom: 8px; }
+.quiz-opt { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 8px; cursor: pointer; font-size: .92rem; }
+.quiz-opt:hover { background: var(--surface-2); }
+.quiz-score { font-size: 1.3rem; margin: 6px 0 2px; }
+.quiz-score b { color: var(--brand); font-size: 1.6rem; }
+.quiz-fb { border-radius: 9px; padding: 8px 12px; margin: 8px 0; background: var(--surface-2); border-left: 3px solid var(--border); }
+.quiz-fb.ok { background: var(--ok-soft); border-color: var(--ok); }
+.quiz-fb.no { background: var(--warn-soft); border-color: var(--warn); }
+.quiz-history { display: flex; flex-direction: column; gap: 10px; }
 .deep-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
 .deep-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; }
 .deep-panel .gen-btn, .deep-panel .qa-ask { align-self: flex-start; }

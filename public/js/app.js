@@ -45,6 +45,7 @@ async function init() {
   }
   window.__appReady = true;
   try { sessionStorage.removeItem('coldReload'); } catch {}
+  await loadState();
   await refreshResourceCounts();
   await refreshKnowledgeCounts();
   renderNav();
@@ -164,9 +165,33 @@ function statCard(big, label, sub) {
 // ---------- Kế hoạch học tập + phiên đào sâu (localStorage) ----------
 const timer = { running: false, startTs: 0, iv: null };
 function getPlan() { return Object.assign({ perWeek: 1, dailyMin: 60 }, JSON.parse(localStorage.getItem('exp_plan') || '{}')); }
-function savePlan(p) { localStorage.setItem('exp_plan', JSON.stringify(p)); }
+function savePlan(p) { localStorage.setItem('exp_plan', JSON.stringify(p)); pushState(); }
 function getLog() { return JSON.parse(localStorage.getItem('exp_studylog') || '{}'); }
-function saveLog(l) { localStorage.setItem('exp_studylog', JSON.stringify(l)); }
+function saveLog(l) { localStorage.setItem('exp_studylog', JSON.stringify(l)); pushState(); }
+
+// ---- Đồng bộ tiến độ/mục tiêu giữa các thiết bị (server là nguồn chung) ----
+let _pushTimer;
+function pushState() {
+  clearTimeout(_pushTimer);
+  _pushTimer = setTimeout(() => {
+    fetch('/api/state', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ progress: state.progress, plan: getPlan(), studylog: getLog() }) }).catch(() => {});
+  }, 900);
+}
+async function loadState() {
+  try {
+    const srv = await fetch('/api/state').then(r => r.json());
+    if (srv && srv.updatedAt) {
+      state.progress = { ...(srv.progress || {}), ...state.progress };
+      localStorage.setItem('exp_progress', JSON.stringify(state.progress));
+      if (srv.plan) localStorage.setItem('exp_plan', JSON.stringify(srv.plan));
+      const local = getLog(), merged = { ...(srv.studylog || {}) };
+      for (const k in local) merged[k] = Math.max(merged[k] || 0, local[k] || 0);
+      localStorage.setItem('exp_studylog', JSON.stringify(merged));
+      pushState();
+    }
+  } catch {}
+}
 function todayKey() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; }
 function addStudyMinutes(min) { const l = getLog(); l[todayKey()] = (l[todayKey()] || 0) + min; saveLog(l); }
 function computeStreak() {
@@ -273,6 +298,7 @@ function renderSession() {
   tabs.innerHTML = `
     <button class="tab ${state.tab === 'lesson' ? 'active' : ''}" data-tab="lesson">📖 Bài học</button>
     <button class="tab ${state.tab === 'deep' ? 'active' : ''}" data-tab="deep">🧠 Đào sâu<span class="tab-badge" id="deepTabCount">${state.knowCounts[s.id] || 0}</span></button>
+    <button class="tab ${state.tab === 'quiz' ? 'active' : ''}" data-tab="quiz">📝 Kiểm tra</button>
     <button class="tab ${state.tab === 'library' ? 'active' : ''}" data-tab="library">📚 Thư viện<span class="tab-badge" id="libTabCount">${cnt}</span></button>
     <button class="tab ${state.tab === 'ai' ? 'active' : ''}" data-tab="ai">🤖 Hỏi AI</button>`;
   main.append(tabs);
@@ -284,11 +310,13 @@ function renderSession() {
   $('#btnDone').onclick = () => {
     if (state.progress[s.id]) delete state.progress[s.id]; else state.progress[s.id] = Date.now();
     localStorage.setItem('exp_progress', JSON.stringify(state.progress));
+    pushState();
     updateProgress(); renderSession();
   };
 
   if (state.tab === 'lesson') renderLesson(body, s);
   else if (state.tab === 'deep') renderDeepTab(body, s);
+  else if (state.tab === 'quiz') renderQuizTab(body, s);
   else if (state.tab === 'library') renderLibraryTab(body, s);
   else renderAITab(body, s);
 }
@@ -437,7 +465,8 @@ function resourceCard(r, showSession) {
   } else if (r.type === 'link') {
     media = `<div class="res-media doc">🔗</div>`;
   }
-  const typeLabel = { text: '📝 Ghi chú', image: '🖼️ Ảnh', pdf: '📄 PDF', youtube: '▶️ YouTube', facebook: '🎬 Facebook Reel', link: '🔗 Liên kết' }[r.type] || r.type;
+  const kindLabel = { example: '🌍 Ví dụ (Đào sâu)', tool: '🧰 Công cụ (Đào sâu)', qa: '🤔 Hỏi AI (Đào sâu)', quiz: '📝 Kết quả kiểm tra' };
+  const typeLabel = kindLabel[r.kind] || { text: '📝 Ghi chú', image: '🖼️ Ảnh', pdf: '📄 PDF', youtube: '▶️ YouTube', facebook: '🎬 Facebook Reel', link: '🔗 Liên kết' }[r.type] || r.type;
   const sess = state.byId[r.sessionId];
   card.innerHTML = media + `
     <div class="res-body">
@@ -567,36 +596,43 @@ async function loadLibraryGrid() {
 }
 
 // ================= ĐÀO SÂU: 3 bảng kiến thức song song =================
-async function fetchKnowledge(session) {
-  const d = await fetch('/api/knowledge?session=' + encodeURIComponent(session)).then(r => r.json()).catch(() => ({ items: [] }));
-  return d.items || [];
+const DEEP_KINDS = ['example', 'tool', 'qa'];
+async function fetchDeepSaved(session) {
+  const all = await fetchResources({ session });
+  return all.filter(r => DEEP_KINDS.includes(r.kind));
 }
 async function refreshKnowledgeCounts() {
-  const all = await fetch('/api/knowledge').then(r => r.json()).catch(() => ({ items: [] }));
+  const all = await fetchResources({});
   const c = {};
-  for (const k of all.items || []) c[k.sessionId] = (c[k.sessionId] || 0) + 1;
+  for (const r of all) if (DEEP_KINDS.includes(r.kind)) c[r.sessionId] = (c[r.sessionId] || 0) + 1;
   state.knowCounts = c;
 }
-function bumpKnowCount(sid, delta) {
+function bumpDeep(sid, delta) {
   state.knowCounts[sid] = Math.max(0, (state.knowCounts[sid] || 0) + delta);
-  const badge = $('#deepTabCount');
-  if (badge) badge.textContent = state.knowCounts[sid] || 0;
+  state.resCounts[sid] = Math.max(0, (state.resCounts[sid] || 0) + delta);
+  const d = $('#deepTabCount'); if (d) d.textContent = state.knowCounts[sid] || 0;
+  const l = $('#libTabCount'); if (l) l.textContent = state.resCounts[sid] || 0;
   renderNav($('#sessionSearch').value);
 }
-async function saveKnowledgeItem(payload) {
-  const r = await fetch('/api/knowledge', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-  const d = await r.json(); if (!r.ok) throw new Error(d.error || 'Lỗi lưu'); return d.item;
+async function saveDeepResource({ sessionId, kind, title, content, source, question }) {
+  const r = await fetch('/api/resources', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sessionId, type: 'text', kind, title, note: content, url: source, question, tags: [kind, 'đào-sâu'] }) });
+  const d = await r.json(); if (!r.ok) throw new Error(d.error || 'Lỗi lưu'); return d.resource;
 }
 
 async function renderDeepTab(body, s) {
-  body.innerHTML = `<div class="muted small deep-intro">Ba bảng song song để đào sâu <b>${esc(s.title_vi)}</b>. Kết quả AI có nguồn — bạn <b>💾 Lưu</b> vào kho kiến thức hoặc <b>✕ Bỏ</b>.</div>`;
+  body.innerHTML = `<div class="deep-topbar">
+    <div class="muted small">Bốn bảng để đào sâu <b>${esc(s.title_vi)}</b>. Kết quả AI <b>💾 Lưu</b> thẳng vào <b>Thư viện</b> (đồng bộ, xuất & rút insight được).</div>
+    <button class="btn sm primary" id="btnListenDeep">🎧 Nghe toàn bộ</button>
+  </div>`;
   const grid = el('div', 'deep-grid');
   body.append(grid);
-  const all = await fetchKnowledge(s.id);
+  const saved = await fetchDeepSaved(s.id);
   grid.append(lessonPanel(s));
-  grid.append(genPanel(s, 'example', '🌍 Ví dụ thực tế', 'Case/tình huống thật, trích nguồn web', all.filter(k => k.kind === 'example')));
-  grid.append(genPanel(s, 'tool', '🧰 Công cụ / Thư viện', 'Công cụ, website nên dùng cho phần này', all.filter(k => k.kind === 'tool')));
-  grid.append(qaPanel(s, all.filter(k => k.kind === 'qa')));
+  grid.append(genPanel(s, 'example', '🌍 Ví dụ thực tế', 'Case/tình huống thật, trích nguồn web', saved.filter(k => k.kind === 'example')));
+  grid.append(genPanel(s, 'tool', '🧰 Công cụ / Thư viện', 'Công cụ, website nên dùng cho phần này', saved.filter(k => k.kind === 'tool')));
+  grid.append(qaPanel(s, saved.filter(k => k.kind === 'qa')));
+  $('#btnListenDeep', body).onclick = () => startListenDeep(s, saved);
 }
 
 function lessonPanel(s) {
@@ -610,18 +646,20 @@ function lessonPanel(s) {
 
 function savedRow(item, savedBox) {
   const row = el('div', 'know-row');
+  const content = item.note != null ? item.note : (item.content || '');
+  const source = item.url || item.source || '';
   row.innerHTML = `
     ${item.kind === 'qa' && item.question ? `<div class="know-q">❓ ${esc(item.question)}</div>` : ''}
     ${item.title ? `<div class="know-title">${esc(item.title)}</div>` : ''}
-    <div class="know-content">${formatMarkdown(item.content)}</div>
+    <div class="know-content">${formatMarkdown(content)}</div>
     <div class="know-foot">
-      ${item.source ? `<a href="${esc(item.source)}" target="_blank" rel="noopener" class="res-src">🔗 Nguồn</a>` : '<span></span>'}
-      <button class="btn danger-text" title="Xóa khỏi kho">🗑</button>
+      ${source ? `<a href="${esc(source)}" target="_blank" rel="noopener" class="res-src">🔗 Nguồn</a>` : '<span></span>'}
+      <button class="btn danger-text" title="Xóa">🗑</button>
     </div>`;
   $('.danger-text', row).onclick = async () => {
-    if (!confirm('Xóa mục kiến thức này?')) return;
-    await fetch('/api/knowledge/' + item.id, { method: 'DELETE' });
-    bumpKnowCount(item.sessionId, -1);
+    if (!confirm('Xóa mục này khỏi thư viện?')) return;
+    await fetch('/api/resources/' + item.id, { method: 'DELETE' });
+    bumpDeep(item.sessionId, -1);
     row.remove();
   };
   return row;
@@ -644,9 +682,9 @@ function candidateCard(cand, kind, s, savedBox, extra = {}) {
   $('.act-save', card).onclick = async () => {
     $('.act-save', card).disabled = true;
     try {
-      const item = await saveKnowledgeItem({ sessionId: s.id, kind, title: cand.title || '', content: cand.content || '', source: cand.source || '', question: extra.question || '' });
+      const item = await saveDeepResource({ sessionId: s.id, kind, title: cand.title || '', content: cand.content || '', source: cand.source || '', question: extra.question || '' });
       savedBox.prepend(savedRow(item, savedBox));
-      bumpKnowCount(s.id, +1);
+      bumpDeep(s.id, +1);
       card.remove();
     } catch (e) { alert(e.message); $('.act-save', card).disabled = false; }
   };
@@ -704,6 +742,101 @@ function qaPanel(s, saved) {
   return panel;
 }
 
+// ================= KIỂM TRA / THU HOẠCH =================
+async function renderQuizTab(body, s) {
+  body.innerHTML = `<div class="deep-topbar">
+      <div class="muted small">Kiểm tra thu hoạch phần <b>${esc(s.title_vi)}</b> — trắc nghiệm + tự luận, AI chấm điểm. Kết quả lưu vào Thư viện.</div>
+      <button class="btn primary" id="genQuiz">📝 Tạo đề kiểm tra</button>
+    </div>
+    <div id="quizArea"></div>
+    <div class="deep-h" style="margin-top:20px">🗂️ Kết quả đã lưu</div>
+    <div id="quizHistory" class="quiz-history"></div>`;
+  const area = $('#quizArea', body), hist = $('#quizHistory', body);
+  renderQuizHistory(hist, await fetchResources({ session: s.id, kind: 'quiz' }));
+  $('#genQuiz', body).onclick = async () => {
+    area.innerHTML = `<div class="insight-loading">⏳ AI đang soạn đề kiểm tra…</div>`;
+    try {
+      const r = await fetch('/api/quiz/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: s.id }) });
+      const d = await r.json();
+      if (!r.ok) { area.innerHTML = `<div class="insight-error">⚠️ ${esc(d.error)}</div>`; return; }
+      renderQuizForm(area, s, d.quiz, hist);
+    } catch { area.innerHTML = `<div class="insight-error">⚠️ Không kết nối được máy chủ.</div>`; }
+  };
+}
+function renderQuizHistory(box, items) {
+  box.innerHTML = '';
+  if (!items.length) { box.innerHTML = `<div class="muted small">Chưa có kết quả nào.</div>`; return; }
+  items.forEach(it => box.append(savedRow(it, box)));
+}
+function renderQuizForm(area, s, quiz, hist) {
+  const mc = quiz.mc || [], essay = quiz.essay || [];
+  let html = '<div class="quiz-card">';
+  mc.forEach((q, i) => {
+    html += `<div class="quiz-q"><div class="quiz-qtext">Câu ${i + 1}. ${esc(q.q)}</div>`;
+    (q.options || []).forEach((o, j) => { html += `<label class="quiz-opt"><input type="radio" name="mc${i}" value="${j}"> ${esc(o)}</label>`; });
+    html += `</div>`;
+  });
+  essay.forEach((q, i) => {
+    html += `<div class="quiz-q"><div class="quiz-qtext">Tự luận ${i + 1}. ${esc(q.q)}</div>
+      <textarea class="qa-input" data-essay="${i}" rows="3" placeholder="Nhập câu trả lời…"></textarea></div>`;
+  });
+  html += `<button class="btn primary" id="submitQuiz">✅ Nộp bài & chấm điểm</button><div id="quizResult"></div></div>`;
+  area.innerHTML = html;
+  $('#submitQuiz', area).onclick = () => gradeQuiz(area, s, quiz, hist);
+}
+async function gradeQuiz(area, s, quiz, hist) {
+  const mc = quiz.mc || [], essay = quiz.essay || [];
+  const btn = $('#submitQuiz', area); btn.disabled = true; btn.textContent = '⏳ Đang chấm…';
+  let mcCorrect = 0; const mcDetail = [];
+  mc.forEach((q, i) => {
+    const sel = area.querySelector(`input[name=mc${i}]:checked`);
+    const chosen = sel ? +sel.value : -1;
+    const ok = chosen === q.answer; if (ok) mcCorrect++;
+    mcDetail.push({ q, chosen, ok });
+  });
+  const essayAns = essay.map((q, i) => ({ q: q.q, guide: q.guide || '', answer: (area.querySelector(`textarea[data-essay="${i}"]`)?.value || '').trim() }));
+  let essayResults = [];
+  if (essayAns.length) {
+    try {
+      const r = await fetch('/api/quiz/grade', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId: s.id, essays: essayAns }) });
+      const d = await r.json(); essayResults = d.results || [];
+    } catch {}
+  }
+  const mcScore = mc.length ? (mcCorrect / mc.length * 10) : null;
+  const essayScore = essayResults.length ? (essayResults.reduce((a, b) => a + (+b.score || 0), 0) / essayResults.length) : null;
+  const parts = []; if (mcScore != null) parts.push(mcScore); if (essayScore != null) parts.push(essayScore);
+  const overall = parts.length ? (parts.reduce((a, b) => a + b, 0) / parts.length) : 0;
+
+  let rhtml = `<div class="quiz-score">Điểm tổng: <b>${overall.toFixed(1)}</b>/10</div>
+    <div class="muted small">Trắc nghiệm: ${mcCorrect}/${mc.length}${essayScore != null ? ` · Tự luận: ${essayScore.toFixed(1)}/10` : ''}</div>`;
+  mcDetail.forEach((it, i) => {
+    rhtml += `<div class="quiz-fb ${it.ok ? 'ok' : 'no'}"><b>${it.ok ? '✅' : '❌'} Câu ${i + 1}:</b> Đáp án đúng: <b>${esc(it.q.options[it.q.answer] || '')}</b>${it.q.explain ? `<div class="muted small">${esc(it.q.explain)}</div>` : ''}</div>`;
+  });
+  essay.forEach((q, i) => {
+    const r = essayResults[i] || {};
+    rhtml += `<div class="quiz-fb"><b>📝 Tự luận ${i + 1}${r.score != null ? ` — ${r.score}/10` : ''}</b>${r.feedback ? `<div class="muted small">${esc(r.feedback)}</div>` : ''}</div>`;
+  });
+  $('#quizResult', area).innerHTML = rhtml + `<button class="btn primary" id="saveQuiz" style="margin-top:12px">💾 Lưu kết quả vào Thư viện</button>`;
+  btn.style.display = 'none';
+
+  // Tóm tắt để lưu
+  let summary = `Điểm tổng: ${overall.toFixed(1)}/10 (Trắc nghiệm ${mcCorrect}/${mc.length}${essayScore != null ? `, Tự luận ${essayScore.toFixed(1)}/10` : ''}).\n\n`;
+  mcDetail.forEach((it, i) => { summary += `Câu ${i + 1}: ${it.ok ? 'Đúng' : 'Sai'}. Đáp án đúng: ${it.q.options[it.q.answer] || ''}.\n`; });
+  essay.forEach((q, i) => { const r = essayResults[i] || {}; summary += `Tự luận ${i + 1} (${r.score ?? '-'}/10): ${(r.feedback || '').slice(0, 200)}\n`; });
+
+  $('#saveQuiz', area).onclick = async (e) => {
+    e.target.disabled = true;
+    try {
+      const rr = await fetch('/api/resources', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId: s.id, type: 'text', kind: 'quiz', title: `Kết quả kiểm tra — ${new Date().toLocaleString('vi-VN')} — ${overall.toFixed(1)}/10`, note: summary, tags: ['kiểm-tra', 'thu-hoạch'] }) });
+      const d = await rr.json(); if (!rr.ok) throw new Error(d.error);
+      state.resCounts[s.id] = (state.resCounts[s.id] || 0) + 1;
+      renderQuizHistory(hist, await fetchResources({ session: s.id, kind: 'quiz' }));
+      e.target.textContent = '✅ Đã lưu vào Thư viện';
+    } catch (err) { alert(err.message); e.target.disabled = false; }
+  };
+}
+
 // ================= NGHE BÀI (Text-to-Speech, chế độ ngồi xe) =================
 const player = { chunks: [], idx: 0, playing: false, session: null, rate: 1, voice: null, autoNext: true, keepAlive: null };
 const _viRe = /[àáảãạăắằẳẵặâấầẩẫậèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵđ]/i;
@@ -727,7 +860,34 @@ function nextSessionId(id) {
 }
 function startListen(s) {
   if (!('speechSynthesis' in window)) { alert('Trình duyệt không hỗ trợ đọc giọng nói. Hãy dùng Chrome/Edge.'); return; }
-  player.session = s; player.chunks = buildSpeechChunks(s); player.idx = 0;
+  player.session = s; player.label = s.title_vi; player.chunks = buildSpeechChunks(s); player.idx = 0;
+  ensurePlayerUI(); $('#miniPlayer').classList.add('show');
+  playSpeech();
+}
+function splitSentences(t) {
+  return String(t).replace(/\s*\|\s*/g, ', ').split(/(?<=[.!?…])\s+|\n+/).map(x => x.trim()).filter(x => x.length > 1);
+}
+function buildDeepChunks(s, saved) {
+  const out = [`Đào sâu: ${s.title_vi}.`, 'Phần nội dung bài học.'];
+  out.push(...buildSpeechChunks(s).slice(1));
+  const add = (label, kind) => {
+    const items = saved.filter(k => k.kind === kind);
+    if (!items.length) return;
+    out.push(`Phần ${label}.`);
+    items.forEach(it => {
+      if (it.question) out.push('Câu hỏi: ' + it.question);
+      if (it.title) out.push(it.title + '.');
+      splitSentences(it.note || it.content || '').forEach(x => out.push(x));
+    });
+  };
+  add('ví dụ thực tế', 'example');
+  add('công cụ và thư viện', 'tool');
+  add('hỏi AI tra cứu', 'qa');
+  return out;
+}
+function startListenDeep(s, saved) {
+  if (!('speechSynthesis' in window)) { alert('Trình duyệt không hỗ trợ đọc giọng nói. Hãy dùng Chrome/Edge.'); return; }
+  player.session = null; player.label = 'Đào sâu · ' + s.title_vi; player.chunks = buildDeepChunks(s, saved); player.idx = 0;
   ensurePlayerUI(); $('#miniPlayer').classList.add('show');
   playSpeech();
 }
@@ -752,8 +912,8 @@ function stopSpeech() { player.playing = false; window.speechSynthesis.cancel();
 function nextSpeech(auto) {
   if (player.idx < player.chunks.length - 1) { player.idx++; if (player.playing) speakCurrent(); else updatePlayerUI(); }
   else {
-    const ni = player.autoNext ? nextSessionId(player.session.id) : null;
-    if (ni) { const ns = state.byId[ni]; player.session = ns; player.chunks = buildSpeechChunks(ns); player.idx = 0; if (player.playing) speakCurrent(); else updatePlayerUI(); }
+    const ni = (player.autoNext && player.session) ? nextSessionId(player.session.id) : null;
+    if (ni) { const ns = state.byId[ni]; player.session = ns; player.label = ns.title_vi; player.chunks = buildSpeechChunks(ns); player.idx = 0; if (player.playing) speakCurrent(); else updatePlayerUI(); }
     else { player.playing = false; window.speechSynthesis.cancel(); clearInterval(player.keepAlive); setPlayIcon(); }
   }
 }
@@ -761,7 +921,7 @@ function prevSpeech() { if (player.idx > 0) { player.idx--; if (player.playing) 
 function setPlayIcon() { const b = $('#pp'); if (b) b.textContent = player.playing ? '⏸' : '▶️'; }
 function updatePlayerUI() {
   const t = $('#playerText'); if (t) t.textContent = player.chunks[player.idx] || '';
-  const meta = $('#playerMeta'); if (meta) meta.textContent = `${player.session.title_vi} · ${player.idx + 1}/${player.chunks.length}`;
+  const meta = $('#playerMeta'); if (meta) meta.textContent = `${player.label || (player.session && player.session.title_vi) || ''} · ${player.idx + 1}/${player.chunks.length}`;
 }
 function loadVoices() {
   const sel = $('#voiceSel'); if (!sel) return;

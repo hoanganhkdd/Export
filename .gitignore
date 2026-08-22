@@ -12,3 +12,6 @@ server/data/knowledge.json
 
 # Cấu hình cá nhân Claude Code
 .claude/settings.local.json
+
+# Trạng thái đồng bộ runtime
+server/data/state.json
