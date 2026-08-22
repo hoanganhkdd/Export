@@ -192,7 +192,11 @@ code { background: var(--surface-2); padding: 1px 5px; border-radius: 5px; font-
 .switch.small { font-size: .82rem; }
 
 /* ---- Nghe bài (mini player) ---- */
-.listen-bar { display: flex; align-items: center; gap: 12px; background: var(--ok-soft); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; flex-wrap: wrap; }
+.listen-bar { display: flex; align-items: center; gap: 12px; background: var(--ok-soft); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; flex-wrap: wrap; }
+.quick-add { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; margin-bottom: 18px; }
+.quick-add .qa-label { font-size: .84rem; font-weight: 600; color: var(--text-2); margin-right: 2px; }
+.chip-add { font-family: inherit; font-size: .82rem; padding: 6px 11px; border-radius: 99px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); cursor: pointer; transition: .12s; }
+.chip-add:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
 .mini-player { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%) translateY(140%); width: min(720px, calc(100% - 24px)); background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 8px 40px rgba(0,0,0,.25); padding: 12px 16px; z-index: 70; transition: transform .3s; }
 .mini-player.show { transform: translateX(-50%) translateY(0); }
 .mp-meta { font-size: .74rem; color: var(--muted); font-weight: 600; }

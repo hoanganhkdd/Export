@@ -301,6 +301,18 @@ function renderLesson(body, s) {
   body.append(bar);
   $('#btnListen', bar).onclick = () => startListen(s);
 
+  // Cập nhật tư liệu nhanh ngay tại giai đoạn: YouTube / Reel / PDF / Ảnh / Text
+  const quick = el('div', 'quick-add');
+  quick.innerHTML = `<span class="qa-label">➕ Cập nhật tư liệu cho giai đoạn này:</span>
+    <button class="chip-add" data-t="youtube">▶️ YouTube</button>
+    <button class="chip-add" data-t="facebook">🎬 Reel</button>
+    <button class="chip-add" data-t="pdf">📄 PDF</button>
+    <button class="chip-add" data-t="image">🖼️ Ảnh</button>
+    <button class="chip-add" data-t="text">📝 Text</button>
+    <button class="chip-add" data-t="link">🔗 Link</button>`;
+  body.append(quick);
+  $$('.chip-add', quick).forEach(b => b.onclick = () => openAddModal(s.id, s.title_vi, b.dataset.t));
+
   for (const sl of s.slides) {
     const card = renderSlide(sl);
     if (card) body.append(card);
@@ -510,12 +522,12 @@ function ytId(url) {
 
 // ---------- Add resource modal ----------
 let addSessionId = 'general';
-function openAddModal(sessionId, sessionTitle) {
+function openAddModal(sessionId, sessionTitle, type = 'text') {
   addSessionId = sessionId;
   $('#addTarget').innerHTML = `Sẽ lưu vào session: <b>${esc(sessionTitle || 'Chung')}</b>`;
   $('#addResError').textContent = '';
   $('#addResForm').reset();
-  setResType('text');
+  setResType(type);
   showModal('#addResModal');
 }
 function setResType(type) {
