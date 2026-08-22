@@ -14,6 +14,7 @@ const state = {
   tab: 'lesson',
   progress: JSON.parse(localStorage.getItem('exp_progress') || '{}'),
   resCounts: {},
+  knowCounts: {},
 };
 
 // ---------- Boot ----------
@@ -45,6 +46,7 @@ async function init() {
   window.__appReady = true;
   try { sessionStorage.removeItem('coldReload'); } catch {}
   await refreshResourceCounts();
+  await refreshKnowledgeCounts();
   renderNav();
   const startId = location.hash.replace('#', '');
   if (startId === 'home' || !startId) openHome();
@@ -75,9 +77,10 @@ function renderNav(filter = '') {
       const item = el('div', 'nav-item' + (done ? ' done' : '') + (s.id === state.current ? ' active' : ''));
       item.dataset.id = s.id;
       const cnt = state.resCounts[s.id] || 0;
+      const kcnt = state.knowCounts[s.id] || 0;
       item.innerHTML = `<span class="nav-dot">${done ? '✓' : ''}</span>
         <span>${esc(s.title_vi)}</span>
-        ${cnt ? `<span class="nav-count">📎${cnt}</span>` : ''}`;
+        ${cnt || kcnt ? `<span class="nav-count">${cnt ? '📎' + cnt : ''}${kcnt ? ' 🧠' + kcnt : ''}</span>` : ''}`;
       item.onclick = () => { openSession(s.id); if (window.innerWidth < 860) $('#sidebar').classList.remove('open'); };
       g.append(item);
     }
@@ -269,7 +272,7 @@ function renderSession() {
   const tabs = el('div', 'tabs');
   tabs.innerHTML = `
     <button class="tab ${state.tab === 'lesson' ? 'active' : ''}" data-tab="lesson">📖 Bài học</button>
-    <button class="tab ${state.tab === 'deep' ? 'active' : ''}" data-tab="deep">🧠 Đào sâu</button>
+    <button class="tab ${state.tab === 'deep' ? 'active' : ''}" data-tab="deep">🧠 Đào sâu<span class="tab-badge" id="deepTabCount">${state.knowCounts[s.id] || 0}</span></button>
     <button class="tab ${state.tab === 'library' ? 'active' : ''}" data-tab="library">📚 Thư viện<span class="tab-badge" id="libTabCount">${cnt}</span></button>
     <button class="tab ${state.tab === 'ai' ? 'active' : ''}" data-tab="ai">🤖 Hỏi AI</button>`;
   main.append(tabs);
@@ -321,7 +324,7 @@ async function renderLibraryTab(body, s) {
   const grid = el('div', 'resource-grid');
   body.append(grid);
   const items = await fetchResources({ session: s.id });
-  expBtn.onclick = () => exportMarkdown(items, `thu-vien_${s.id}.md`, s.title_vi);
+  expBtn.onclick = async () => exportMarkdown(items, await fetchKnowledge(s.id), `hoc-tap_${s.id}.md`, s.title_vi);
   renderResourceCards(grid, items, { showSession: false });
 }
 
@@ -556,6 +559,18 @@ async function fetchKnowledge(session) {
   const d = await fetch('/api/knowledge?session=' + encodeURIComponent(session)).then(r => r.json()).catch(() => ({ items: [] }));
   return d.items || [];
 }
+async function refreshKnowledgeCounts() {
+  const all = await fetch('/api/knowledge').then(r => r.json()).catch(() => ({ items: [] }));
+  const c = {};
+  for (const k of all.items || []) c[k.sessionId] = (c[k.sessionId] || 0) + 1;
+  state.knowCounts = c;
+}
+function bumpKnowCount(sid, delta) {
+  state.knowCounts[sid] = Math.max(0, (state.knowCounts[sid] || 0) + delta);
+  const badge = $('#deepTabCount');
+  if (badge) badge.textContent = state.knowCounts[sid] || 0;
+  renderNav($('#sessionSearch').value);
+}
 async function saveKnowledgeItem(payload) {
   const r = await fetch('/api/knowledge', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
   const d = await r.json(); if (!r.ok) throw new Error(d.error || 'Lỗi lưu'); return d.item;
@@ -584,6 +599,7 @@ function savedRow(item, savedBox) {
   $('.danger-text', row).onclick = async () => {
     if (!confirm('Xóa mục kiến thức này?')) return;
     await fetch('/api/knowledge/' + item.id, { method: 'DELETE' });
+    bumpKnowCount(item.sessionId, -1);
     row.remove();
   };
   return row;
@@ -608,6 +624,7 @@ function candidateCard(cand, kind, s, savedBox, extra = {}) {
     try {
       const item = await saveKnowledgeItem({ sessionId: s.id, kind, title: cand.title || '', content: cand.content || '', source: cand.source || '', question: extra.question || '' });
       savedBox.prepend(savedRow(item, savedBox));
+      bumpKnowCount(s.id, +1);
       card.remove();
     } catch (e) { alert(e.message); $('.act-save', card).disabled = false; }
   };
@@ -766,26 +783,49 @@ function ensurePlayerUI() {
 
 // ---------- Export Markdown ----------
 let libGridItems = [];
-function exportMarkdown(items, filename, scopeLabel) {
+function exportMarkdown(items, knowledge, filename, scopeLabel) {
   const origin = location.origin;
   const typeLabel = { text: 'Ghi chú', image: 'Ảnh', pdf: 'PDF', youtube: 'YouTube', facebook: 'Facebook Reel', link: 'Liên kết' };
-  let md = `# Thư viện tài liệu — ${scopeLabel || 'Toàn bộ'}\n\n`;
-  md += `> Xuất từ app *Học Vận hành Xuất khẩu End-to-End* · ${new Date().toLocaleString('vi-VN')} · ${items.length} tài liệu\n\n`;
-  // nhóm theo session
-  const groups = {};
-  for (const r of items) (groups[r.sessionId] ||= []).push(r);
-  for (const [sid, list] of Object.entries(groups)) {
-    const sess = state.byId[sid];
-    md += `\n## ${sess ? sess.title_vi : sid}\n\n`;
-    for (const r of list) {
-      md += `### ${r.title}\n`;
-      md += `- **Loại:** ${typeLabel[r.type] || r.type}\n`;
-      if (r.url) md += `- **Nguồn:** ${r.url.startsWith('/') ? origin + r.url : r.url}\n`;
-      if (r.tags?.length) md += `- **Tags:** ${r.tags.map(t => '#' + t).join(' ')}\n`;
-      if (r.note) md += `\n${r.note}\n`;
-      md += `\n`;
+  const kindLabel = { example: '🌍 Ví dụ thực tế', tool: '🧰 Công cụ', qa: '🤔 Hỏi AI' };
+  let md = `# Học Vận hành Xuất khẩu — ${scopeLabel || 'Toàn bộ'}\n\n`;
+  md += `> Xuất từ app *Học Vận hành Xuất khẩu End-to-End* · ${new Date().toLocaleString('vi-VN')} · ${items.length} tài liệu · ${(knowledge || []).length} mục kiến thức\n\n`;
+
+  if (items.length) {
+    md += `# 📚 Thư viện tài liệu\n`;
+    const groups = {};
+    for (const r of items) (groups[r.sessionId] ||= []).push(r);
+    for (const [sid, list] of Object.entries(groups)) {
+      const sess = state.byId[sid];
+      md += `\n## ${sess ? sess.title_vi : sid}\n\n`;
+      for (const r of list) {
+        md += `### ${r.title}\n`;
+        md += `- **Loại:** ${typeLabel[r.type] || r.type}\n`;
+        if (r.url) md += `- **Nguồn:** ${r.url.startsWith('/') ? origin + r.url : r.url}\n`;
+        if (r.tags?.length) md += `- **Tags:** ${r.tags.map(t => '#' + t).join(' ')}\n`;
+        if (r.note) md += `\n${r.note}\n`;
+        if (r.insight?.text) md += `\n> ✨ **Insight:** ${r.insight.text.replace(/\n/g, '\n> ')}\n`;
+        md += `\n`;
+      }
     }
   }
+
+  if (knowledge && knowledge.length) {
+    md += `\n# 🧠 Kho kiến thức đào sâu\n`;
+    const kg = {};
+    for (const k of knowledge) (kg[k.sessionId] ||= []).push(k);
+    for (const [sid, list] of Object.entries(kg)) {
+      const sess = state.byId[sid];
+      md += `\n## ${sess ? sess.title_vi : sid}\n\n`;
+      for (const k of list) {
+        md += `### ${kindLabel[k.kind] || ''} ${k.title || (k.question ? 'Hỏi AI' : '')}\n`;
+        if (k.question) md += `- **Câu hỏi:** ${k.question}\n`;
+        if (k.source) md += `- **Nguồn:** ${k.source}\n`;
+        if (k.content) md += `\n${k.content}\n`;
+        md += `\n`;
+      }
+    }
+  }
+
   const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
   const a = el('a');
   a.href = URL.createObjectURL(blob);
@@ -811,6 +851,13 @@ function showModal(sel) { $(sel).hidden = false; }
 function hideModal(sel) { $(sel).hidden = true; }
 function bindGlobalUI() {
   const brand = $('.brand'); if (brand) { brand.style.cursor = 'pointer'; brand.onclick = openHome; }
+  // Định tuyến theo hash (hỗ trợ nút back/forward của trình duyệt)
+  window.addEventListener('hashchange', () => {
+    const id = location.hash.replace('#', '') || 'home';
+    if (id === state.current) return;
+    if (id === 'home') openHome();
+    else if (state.byId[id]) openSession(id);
+  });
   $('#btnLibrary').onclick = openLibrary;
   $('#btnSettings').onclick = openSettings;
   $('#btnTheme').onclick = () => applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
@@ -831,12 +878,15 @@ function bindGlobalUI() {
   // settings save
   $('#saveSettings').onclick = saveSettings;
 
-  // export markdown (thư viện chung — theo bộ lọc hiện tại)
-  $('#btnExportMd').onclick = () => {
-    if (!libGridItems.length) { alert('Không có tài liệu nào để xuất.'); return; }
+  // export markdown (thư viện chung — theo bộ lọc hiện tại, kèm kho kiến thức)
+  $('#btnExportMd').onclick = async () => {
     const sf = $('#libSessionFilter');
     const label = sf.value ? sf.options[sf.selectedIndex].text : 'Toàn bộ thư viện';
-    exportMarkdown(libGridItems, 'thu-vien-xuat-khau.md', label);
+    const kn = sf.value
+      ? await fetchKnowledge(sf.value)
+      : await fetch('/api/knowledge').then(r => r.json()).then(d => d.items || []).catch(() => []);
+    if (!libGridItems.length && !kn.length) { alert('Không có nội dung nào để xuất.'); return; }
+    exportMarkdown(libGridItems, kn, 'hoc-tap-xuat-khau.md', label);
   };
 }
 
