@@ -40,12 +40,18 @@ hỗ trợ sáng/tối, responsive (mobile ok).
         cố định đáy màn hình: play/pause, câu trước/sau, chỉnh tốc độ, chọn giọng (ưu tiên vi-VN), tự chuyển session.
       - Thanh ➕ cập nhật tư liệu nhanh: chip YouTube / Reel Facebook / PDF / Ảnh / Text / Link → mở form đúng loại,
         lưu vào đúng session.
-   b) 🧠 Đào sâu: 4 bảng song song:
+   b) 🧠 Đào sâu: 4 bảng song song + nút 🎧 "Nghe toàn bộ" (TTS đọc nối: nội dung bài học + ví dụ + công cụ + hỏi-đáp đã lưu):
       - 📖 Nội dung bài học (render slide của session, cuộn được — để đối chiếu).
       - 🌍 Ví dụ thực tế: nút "Gợi ý bằng AI (có nguồn)" → gọi AI web_search, trả JSON các ví dụ thật kèm URL nguồn.
       - 🧰 Công cụ / Thư viện: tương tự, liệt kê công cụ/website thật kèm URL.
       - 🤔 Hỏi AI tra cứu: ô nhập câu hỏi (tùy chọn "Tìm web kèm nguồn") → trả lời theo ngữ cảnh session.
-      - Mỗi kết quả AI có nút 💾 Lưu (vào kho kiến thức) hoặc ✕ Bỏ. Mục đã lưu hiển thị bên dưới, có nút 🗑 xóa.
+      - Mỗi kết quả AI có nút 💾 Lưu hoặc ✕ Bỏ. QUAN TRỌNG: khi Lưu → lưu THẲNG thành tài liệu Thư viện
+        (resource type 'text' + field `kind`=example|tool|qa), để mọi nội dung đào sâu đều nằm trong Thư viện
+        (đồng bộ, xuất Markdown, rút insight được). Mục đã lưu hiện bên dưới, có nút 🗑 xóa.
+   b2) 📝 Kiểm tra / Thu hoạch: nút "Tạo đề" → AI ra đề TRẮC NGHIỆM (4 lựa chọn) + TỰ LUẬN theo nội dung giai đoạn
+      (`/api/quiz/generate` trả JSON {mc:[{q,options,answer,explain}], essay:[{q,guide}]}). Người dùng làm bài → Nộp:
+      tự chấm trắc nghiệm, AI chấm tự luận (`/api/quiz/grade`), hiện điểm + phản hồi. Nút 💾 Lưu kết quả vào Thư viện
+      (resource kind='quiz', tag 'kiểm-tra'). Hiện lịch sử kết quả đã lưu.
    c) 📚 Thư viện: thêm/xóa tài liệu (text/ảnh upload/PDF upload/YouTube nhúng/Facebook reel nhúng/link),
       lưu kèm source link + tag; nút ✨ "Rút insight bài học" cho từng tài liệu (AI đọc transcript video / text PDF /
       nội dung link → tóm tắt insight có cấu trúc, cache lại); nút ⬇️ Xuất .md.
@@ -61,8 +67,14 @@ hỗ trợ sáng/tối, responsive (mobile ok).
    - Nguồn nội dung cho insight: YouTube→transcript (`youtube-transcript`), PDF→`pdf-parse` v2
      (`new PDFParse({data}).getText()`), link→fetch+strip HTML, ảnh→vision, không lấy được→web_search fallback.
 
+5) ĐỒNG BỘ ĐA THIẾT BỊ (máy tính ↔ điện thoại): lưu tiến độ + mục tiêu + nhật ký học lên server
+   (`GET/POST /api/state` → state.json). Client tải state khi mở app (hợp nhất với localStorage: progress union,
+   studylog lấy max theo ngày, plan lấy server), và đẩy lên server (debounce) mỗi khi thay đổi. Nhờ dữ liệu Thư viện
+   vốn ở server, hai thiết bị cùng vào một URL Render sẽ thấy chung mọi thứ. localStorage chỉ là cache offline.
+
 # API BACKEND (Express)
 - GET  /api/curriculum
+- GET/POST /api/state ; POST /api/quiz/generate ; POST /api/quiz/grade
 - GET/POST /api/resources ; POST /api/resources/upload (multer) ; DELETE /api/resources/:id
 - GET/POST /api/knowledge ; DELETE /api/knowledge/:id ; POST /api/knowledge/generate
 - GET/POST /api/settings ; POST /api/chat ; POST /api/insight
