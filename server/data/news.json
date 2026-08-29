@@ -1,0 +1,67 @@
+{
+ "date": "",
+ "generatedAt": 0,
+ "seed": true,
+ "items": [
+  {
+   "id": "seed01",
+   "title": "Tra nhu cầu nhập khẩu theo mã HS bằng ITC Trade Map",
+   "summary": "Trade Map (ITC) cho xem kim ngạch nhập khẩu của từng quốc gia theo mã HS, nước cung ứng và xu hướng nhiều năm. Dùng để chọn thị trường đích có nhu cầu thật thay vì phỏng đoán.",
+   "source": "ITC Trade Map",
+   "url": "https://www.trademap.org/",
+   "sessionId": "s1",
+   "sessionTitle": "GĐ1 · Sản phẩm & Thị trường",
+   "why": "Trực tiếp phục vụ bước phân tích & chấm điểm thị trường của Giai đoạn 1."
+  },
+  {
+   "id": "seed02",
+   "title": "Tra mã HS và biểu thuế xuất nhập khẩu chính thức",
+   "summary": "Cổng Tổng cục Hải quan cho tra biểu thuế và phân loại mã HS chính thức của Việt Nam. Xác định đúng mã HS 8 số trước khi báo giá và làm chứng từ.",
+   "source": "Tổng cục Hải quan",
+   "url": "https://www.customs.gov.vn/",
+   "sessionId": "s1",
+   "sessionTitle": "GĐ1 · Sản phẩm & Thị trường",
+   "why": "Mã HS đúng là đầu vào bắt buộc của bước xác định mã HS ở Giai đoạn 1."
+  },
+  {
+   "id": "seed03",
+   "title": "Danh bạ hội viên & báo cáo thị trường ngành thủy sản",
+   "summary": "VASEP công bố danh bạ doanh nghiệp, số liệu và bản tin thị trường ngành thủy sản. Nguồn để đối chiếu buyer, đối thủ và giá tham chiếu khi thẩm định.",
+   "source": "VASEP",
+   "url": "https://vasep.com.vn/",
+   "sessionId": "s2",
+   "sessionTitle": "GĐ2 · Tìm & Thẩm định Buyer",
+   "why": "Hỗ trợ tìm nguồn và thẩm định buyer/đối tác ở Giai đoạn 2."
+  },
+  {
+   "id": "seed04",
+   "title": "Bộ quy tắc Incoterms 2020 (ICC) — bản gốc",
+   "summary": "Trang chính thức của ICC về Incoterms 2020: phân định trách nhiệm, chi phí và rủi ro giữa người bán và người mua. Trích đúng điều kiện khi soạn PI và hợp đồng.",
+   "source": "ICC",
+   "url": "https://iccwbo.org/business-solutions/incoterms-rules/",
+   "sessionId": "s5",
+   "sessionTitle": "GĐ5 · Đàm phán, PI & Hợp đồng",
+   "why": "Incoterms là điều khoản cốt lõi của PI/hợp đồng ở Giai đoạn 5."
+  },
+  {
+   "id": "seed05",
+   "title": "Cấp C/O điện tử qua hệ thống eCoSys",
+   "summary": "eCoSys là hệ thống khai và cấp Giấy chứng nhận xuất xứ (C/O) điện tử của Bộ Công Thương. Nắm quy trình để chuẩn bị C/O khớp bộ chứng từ.",
+   "source": "Bộ Công Thương — eCoSys",
+   "url": "https://ecosys.gov.vn/",
+   "sessionId": "s8",
+   "sessionTitle": "GĐ8 · Bộ chứng từ & 18 trường",
+   "why": "C/O là một chứng từ phải khớp 18 trường ở Giai đoạn 8."
+  },
+  {
+   "id": "seed06",
+   "title": "Khai báo qua Cổng thông tin một cửa quốc gia",
+   "summary": "Cổng một cửa quốc gia (VNSW) tập trung thủ tục hành chính về hải quan và kiểm tra chuyên ngành. Là nơi thực hiện khai báo và xin giấy phép trước thông quan.",
+   "source": "Cổng một cửa quốc gia",
+   "url": "https://vnsw.gov.vn/",
+   "sessionId": "s9",
+   "sessionTitle": "GĐ9 · Khai báo hải quan",
+   "why": "Trực tiếp phục vụ bước khai báo hải quan của Giai đoạn 9."
+  }
+ ]
+}

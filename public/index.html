@@ -22,6 +22,7 @@
         <div class="progress-bar"><span id="progressFill"></span></div>
         <span id="progressText" class="progress-text">0%</span>
       </div>
+      <button class="btn ghost" id="btnNews" title="Tin tức & kiến thức ngành mới">📰 Tin tức<span class="news-dot" id="newsDot" hidden></span></button>
       <button class="btn ghost" id="btnLibrary">📚 Thư viện chung</button>
       <button class="btn ghost" id="btnSettings" title="Cài đặt AI">⚙️</button>
       <button class="btn ghost icon" id="btnTheme" title="Đổi giao diện sáng/tối">🌙</button>
@@ -39,6 +40,23 @@
     <main class="main" id="main">
       <div class="loading" id="loading">Đang tải giáo án…</div>
     </main>
+  </div>
+
+  <!-- Modal: Tin tức ngành -->
+  <div class="modal-backdrop" id="newsModal" hidden>
+    <div class="modal wide">
+      <div class="modal-head">
+        <h2>📰 Tin tức & kiến thức ngành</h2>
+        <div class="news-head-actions">
+          <button class="btn sm" id="btnNewsRefresh" title="Lấy tin mới hôm nay bằng AI">🔄 Cập nhật tin mới</button>
+          <button class="btn ghost icon" data-close>✕</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="news-meta" id="newsMeta"></div>
+        <div class="news-list" id="newsList"></div>
+      </div>
+    </div>
   </div>
 
   <!-- Modal: Thư viện chung -->

@@ -519,6 +519,89 @@ app.post('/api/knowledge/generate', async (req, res) => {
   }
 });
 
+// ---------- Tin tức ngành: bản tin hằng ngày, trỏ về giai đoạn học ----------
+const NEWS_FILE = path.join(DATA_DIR, 'news.json');
+if (DATA_DIR !== APP_DATA) {
+  const seedNews = path.join(APP_DATA, 'news.json');
+  if (!fs.existsSync(NEWS_FILE) && fs.existsSync(seedNews)) fs.copyFileSync(seedNews, NEWS_FILE);
+}
+function loadNews() { return readJSON(NEWS_FILE, { date: '', items: [], generatedAt: 0 }); }
+function saveNews(n) { writeJSON(NEWS_FILE, n); }
+function todayVN() { return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }); } // YYYY-MM-DD
+function learningStages() {
+  try {
+    const c = JSON.parse(fs.readFileSync(CURRICULUM_FILE, 'utf-8'));
+    return c.sessions
+      .filter(s => /^s([1-9]|1[0-5])$/.test(s.id))
+      .map(s => ({ id: s.id, title: s.title_vi, subtitle: s.subtitle || '' }));
+  } catch { return []; }
+}
+
+app.get('/api/news', (_req, res) => {
+  const s = loadSettings();
+  const hasKey = !!(s.openaiKey || process.env.OPENAI_API_KEY);
+  const n = loadNews();
+  const today = todayVN();
+  res.json({
+    date: n.date || '', today, stale: n.date !== today,
+    items: n.items || [], hasKey, generatedAt: n.generatedAt || 0
+  });
+});
+
+app.post('/api/news/refresh', async (req, res) => {
+  const s = loadSettings();
+  const apiKey = s.openaiKey || process.env.OPENAI_API_KEY;
+  if (!apiKey) return res.status(400).json({ error: 'Chưa cấu hình OpenAI API key. Vào ⚙️ Cài đặt để thêm.' });
+  const today = todayVN();
+  const existing = loadNews();
+  if (!req.body?.force && existing.date === today && (existing.items || []).length) {
+    return res.json({ date: existing.date, today, items: existing.items, cached: true });
+  }
+  const model = s.model || process.env.OPENAI_MODEL || 'gpt-4o-mini';
+  const stages = learningStages();
+  const stageList = stages.map(st => `${st.id}: ${st.title} — ${st.subtitle}`).join('\n');
+  const count = Math.min(Math.max(parseInt(req.body?.count, 10) || 6, 3), 10);
+  const prompt = `Hôm nay là ${today}. Hãy tổng hợp ${count} TIN TỨC / KIẾN THỨC MỚI, thực tế và hữu ích cho một nhà xuất khẩu Việt Nam, ưu tiên nội dung trong ~30 ngày gần đây: thay đổi quy định/thuế/FTA, cảnh báo SPS-kiểm dịch, biến động thị trường & giá cước, hội chợ, mã HS, thủ tục hải quan, thanh toán quốc tế, logistics…\n\nGiáo án gồm 15 GIAI ĐOẠN dưới đây. Với MỖI tin, gán đúng MỘT sessionId phù hợp nhất và giải thích ngắn gọn vì sao tin đó liên quan giai đoạn đó:\n${stageList}\n\nTrả về DUY NHẤT một mảng JSON hợp lệ, không thêm chữ nào khác, dạng:\n[{"title":"...","summary":"2-3 câu tiếng Việt","source":"tên nguồn","url":"https://...","sessionId":"s1..s15","why":"1 câu vì sao liên quan giai đoạn"}]`;
+  try {
+    const r = await fetch('https://api.openai.com/v1/responses', {
+      method: 'POST', headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model, tools: [{ type: 'web_search' }],
+        input: [
+          { role: 'system', content: 'Bạn là biên tập viên bản tin ngành xuất nhập khẩu. Chỉ dùng nguồn thật, URL thật, ưu tiên tin mới. Trả lời đúng định dạng JSON được yêu cầu, tuyệt đối không bịa URL.' },
+          { role: 'user', content: prompt }
+        ]
+      })
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error?.message || 'Lỗi OpenAI');
+    const text = extractResponsesText(data);
+    const arr = parseJsonArray(text) || [];
+    const cites = extractCitations(data);
+    const validIds = new Set(stages.map(x => x.id));
+    const items = arr.map((c, i) => {
+      let sid = String(c.sessionId || '').trim();
+      if (!validIds.has(sid)) sid = 's1';
+      const st = stages.find(x => x.id === sid);
+      return {
+        id: crypto.randomBytes(6).toString('hex'),
+        title: String(c.title || '').slice(0, 200),
+        summary: String(c.summary || c.content || '').slice(0, 600),
+        source: String(c.source || '').slice(0, 120),
+        url: c.url || cites[i]?.url || '',
+        sessionId: sid,
+        sessionTitle: st ? st.title : '',
+        why: String(c.why || '').slice(0, 300)
+      };
+    }).filter(x => x.title || x.summary);
+    const n = { date: today, items, generatedAt: Date.now() };
+    saveNews(n);
+    res.json({ date: today, today, items, cached: false });
+  } catch (e) {
+    res.status(502).json({ error: String(e.message || e) });
+  }
+});
+
 // ---------- Đồng bộ tiến độ/mục tiêu giữa các thiết bị ----------
 app.get('/api/state', (_req, res) => res.json(readJSON(STATE_FILE, { progress: {}, plan: null, studylog: {} })));
 app.post('/api/state', (req, res) => {

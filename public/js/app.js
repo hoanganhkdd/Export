@@ -54,6 +54,7 @@ async function init() {
   else if (state.byId[startId]) openSession(startId);
   else openHome();
   updateProgress();
+  maybeDailyNews();
 }
 
 // ---------- Sidebar nav ----------
@@ -1028,6 +1029,114 @@ async function openSettings() {
   showModal('#settingsModal');
 }
 
+// ---------- Tin tức ngành (bản tin hằng ngày, trỏ về giai đoạn học) ----------
+const NEWS_SEEN_KEY = 'exp_news_seen_date';
+let newsData = null;
+
+function currentStageId() {
+  // Giai đoạn đang học = s1..s15 đầu tiên chưa hoàn thành; nếu xong hết thì s15
+  for (let i = 1; i <= 15; i++) {
+    const id = 's' + i;
+    if (state.byId[id] && !state.progress[id]) return id;
+  }
+  return 's15';
+}
+
+async function fetchNews() {
+  try { newsData = await fetch('/api/news').then(r => r.json()); }
+  catch { newsData = { items: [], stale: false, hasKey: false, date: '', today: '' }; }
+  return newsData;
+}
+
+function renderNews() {
+  const list = $('#newsList');
+  const meta = $('#newsMeta');
+  const d = newsData || { items: [] };
+  const items = d.items || [];
+  const curId = currentStageId();
+  const curTitle = state.byId[curId]?.title_vi || '';
+  const bits = [];
+  bits.push(d.date ? `<span class="tag">📅 ${esc(d.date)}</span>` : `<span class="tag">📌 Kiến thức nền</span>`);
+  if (curTitle) bits.push(`Đang học: <b>${esc(curTitle)}</b>`);
+  if (d.stale && d.hasKey) bits.push(`<span class="muted">— bấm 🔄 để lấy tin mới hôm nay</span>`);
+  if (!d.hasKey) bits.push(`<span class="muted">— thêm API key ở ⚙️ để bật tin cập nhật hằng ngày</span>`);
+  meta.innerHTML = bits.join(' ');
+
+  if (!items.length) {
+    list.innerHTML = `<div class="news-empty">Chưa có tin. ${d.hasKey ? 'Bấm 🔄 Cập nhật tin mới.' : 'Thêm OpenAI API key ở ⚙️ Cài đặt để lấy tin.'}</div>`;
+    return;
+  }
+  // Ưu tiên tin của giai đoạn đang học lên đầu
+  const sorted = [...items].sort((a, b) => (b.sessionId === curId ? 1 : 0) - (a.sessionId === curId ? 1 : 0));
+  list.innerHTML = '';
+  for (const it of sorted) {
+    const isCur = it.sessionId === curId;
+    const card = el('div', 'news-item' + (isCur ? ' current' : ''));
+    card.innerHTML = `
+      <div class="ni-title">${esc(it.title)}${isCur ? '<span class="ni-badge">📍 Bài đang học</span>' : ''}</div>
+      ${it.summary ? `<div class="ni-summary">${esc(it.summary)}</div>` : ''}
+      ${it.why ? `<div class="ni-why">${esc(it.why)}</div>` : ''}
+      <div class="ni-foot">
+        ${it.url
+          ? `<a class="ni-src" href="${esc(it.url)}" target="_blank" rel="noopener">🔗 ${esc(it.source || 'Nguồn')}</a>`
+          : `<span class="ni-src">${esc(it.source || '')}</span>`}
+        <button class="ni-goto">→ ${esc(it.sessionTitle || 'Mở giai đoạn')}</button>
+      </div>`;
+    $('.ni-goto', card).onclick = () => { hideModal('#newsModal'); if (state.byId[it.sessionId]) openSession(it.sessionId); };
+    list.append(card);
+  }
+}
+
+function markNewsSeen() {
+  try { localStorage.setItem(NEWS_SEEN_KEY, newsData?.today || new Date().toISOString().slice(0, 10)); } catch {}
+  const dot = $('#newsDot'); if (dot) dot.hidden = true;
+}
+
+async function openNewsModal() {
+  showModal('#newsModal');
+  $('#newsMeta').innerHTML = 'Đang tải…';
+  $('#newsList').innerHTML = '';
+  await fetchNews();
+  renderNews();
+  markNewsSeen();
+}
+
+async function refreshNews() {
+  const btn = $('#btnNewsRefresh');
+  const old = btn.textContent; btn.disabled = true; btn.textContent = '⏳ Đang lấy tin…';
+  $('#newsMeta').innerHTML = 'AI đang tìm tin mới trên web…';
+  try {
+    const r = await fetch('/api/news/refresh', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ force: true })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Lỗi cập nhật tin');
+    await fetchNews();
+    renderNews();
+    markNewsSeen();
+  } catch (e) {
+    $('#newsMeta').innerHTML = `<span class="muted">${esc(String(e.message || e))}</span>`;
+  } finally {
+    btn.disabled = false; btn.textContent = old;
+  }
+}
+
+// Tự động mỗi ngày: nếu có key & tin đã cũ thì lấy tin mới (nền), rồi bật popup 1 lần/ngày
+async function maybeDailyNews() {
+  await fetchNews();
+  if (newsData?.hasKey && newsData?.stale) {
+    try {
+      const r = await fetch('/api/news/refresh', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+      if (r.ok) await fetchNews();
+    } catch {}
+  }
+  const today = newsData?.today || '';
+  let seen = ''; try { seen = localStorage.getItem(NEWS_SEEN_KEY) || ''; } catch {}
+  const hasItems = (newsData?.items || []).length > 0;
+  const dot = $('#newsDot'); if (dot) dot.hidden = !(hasItems && seen !== today);
+  if (hasItems && seen !== today) openNewsModal();
+}
+
 // ---------- Modal helpers & global UI ----------
 function showModal(sel) { $(sel).hidden = false; }
 function hideModal(sel) { $(sel).hidden = true; }
@@ -1040,6 +1149,8 @@ function bindGlobalUI() {
     if (id === 'home') openHome();
     else if (state.byId[id]) openSession(id);
   });
+  $('#btnNews').onclick = openNewsModal;
+  $('#btnNewsRefresh').onclick = refreshNews;
   $('#btnLibrary').onclick = openLibrary;
   $('#btnSettings').onclick = openSettings;
   $('#btnTheme').onclick = () => applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
