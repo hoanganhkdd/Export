@@ -380,6 +380,137 @@
    ],
    "file": null,
    "createdAt": 1787095185659
+  },
+  {
+   "id": "dde37079fe8a9124",
+   "sessionId": "s1",
+   "type": "link",
+   "kind": null,
+   "question": "",
+   "title": "Company Profile mẫu (Mekong Delta Pride) — DOCX",
+   "url": "/uploads/dde37079fe8a9124__Company_Profile_EN.docx",
+   "note": "Hồ sơ năng lực 11 phần song ngữ hoàn chỉnh của một nhà XK trái cây & thủy sản đông lạnh. Dùng làm khung khi dựng Company Profile của bạn.",
+   "tags": [
+    "company-profile",
+    "mẫu",
+    "song ngữ",
+    "build-profile"
+   ],
+   "file": {
+    "name": "Company_Profile_EN.docx",
+    "size": 43179,
+    "mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+   },
+   "createdAt": 1787999275169
+  },
+  {
+   "id": "5dd5a3ad08dca9cb",
+   "sessionId": "s1",
+   "type": "link",
+   "kind": null,
+   "question": "",
+   "title": "Product Catalogue mẫu (Mekong Delta Pride) — DOCX",
+   "url": "/uploads/5dd5a3ad08dca9cb__Product_Catalogue_EN.docx",
+   "note": "Catalogue bán hàng: quy trình đặt hàng 5 bước, điều khoản (MOQ/Incoterms/thanh toán/chứng từ) và thông số 3 dòng sản phẩm.",
+   "tags": [
+    "catalogue",
+    "mẫu",
+    "thông số",
+    "build-profile"
+   ],
+   "file": {
+    "name": "Product_Catalogue_EN.docx",
+    "size": 39691,
+    "mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+   },
+   "createdAt": 1787999275170
+  },
+  {
+   "id": "cd769b55825fccbf",
+   "sessionId": "s1",
+   "type": "link",
+   "kind": null,
+   "question": "",
+   "title": "Data Model marketing XK (RAW/BRG/View) — Excel",
+   "url": "/uploads/cd769b55825fccbf__DataModel_Export_Marketing.xlsx",
+   "note": "Mô hình dữ liệu chuẩn hóa: nhập ở lớp RAW một lần, mọi hồ sơ (Profile/Catalogue/One-Pager) kết xuất từ các View — tránh lệch số liệu.",
+   "tags": [
+    "data-model",
+    "excel",
+    "chuẩn hóa",
+    "build-profile"
+   ],
+   "file": {
+    "name": "DataModel_Export_Marketing.xlsx",
+    "size": 63374,
+    "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+   },
+   "createdAt": 1787999275170
+  },
+  {
+   "id": "e17dc204190fd976",
+   "sessionId": "s1",
+   "type": "link",
+   "kind": null,
+   "question": "",
+   "title": "Bản đồ chiến lược XK trái cây & thủy sản 2026–2030 — Excel",
+   "url": "/uploads/e17dc204190fd976__BanDo_ChienLuoc_XK_TraiCay_ThuySan_2026-2030.xlsx",
+   "note": "Product mapping, lợi thế nhóm hàng, bản đồ 8 thị trường, ma trận ưu tiên chấm điểm và lộ trình chiến lược 2026–2030.",
+   "tags": [
+    "chiến lược",
+    "thị trường",
+    "ma trận ưu tiên",
+    "FTA"
+   ],
+   "file": {
+    "name": "BanDo_ChienLuoc_XK_TraiCay_ThuySan_2026-2030.xlsx",
+    "size": 60084,
+    "mime": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+   },
+   "createdAt": 1787999275171
+  },
+  {
+   "id": "6f4ab8e9b82be114",
+   "sessionId": "s1",
+   "type": "link",
+   "kind": null,
+   "question": "",
+   "title": "Landing Page bán hàng (Mekong Delta Pride) — HTML",
+   "url": "/uploads/6f4ab8e9b82be114__Landing_Page_EN.html",
+   "note": "Trang landing tiếng Anh giới thiệu năng lực & sản phẩm để gửi buyer. Mở trực tiếp trên trình duyệt.",
+   "tags": [
+    "landing-page",
+    "website",
+    "tiếng anh",
+    "build-profile"
+   ],
+   "file": {
+    "name": "Landing_Page_EN.html",
+    "size": 15978,
+    "mime": "text/html"
+   },
+   "createdAt": 1787999275171
+  },
+  {
+   "id": "10a4f15b34a960a9",
+   "sessionId": "s1",
+   "type": "link",
+   "kind": null,
+   "question": "",
+   "title": "Bản đồ Chiến lược Xuất khẩu (bản HTML trực quan)",
+   "url": "/uploads/10a4f15b34a960a9__ban_do_chien_luoc.html",
+   "note": "Phiên bản HTML trực quan của bản đồ chiến lược 2026–2030 — xem nhanh ngay trên trình duyệt.",
+   "tags": [
+    "chiến lược",
+    "trực quan",
+    "HTML"
+   ],
+   "file": {
+    "name": "ban_do_chien_luoc.html",
+    "size": 90077,
+    "mime": "text/html"
+   },
+   "createdAt": 1787999275172
   }
  ]
 }

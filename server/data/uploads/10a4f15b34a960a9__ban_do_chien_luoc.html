@@ -1,0 +1,1273 @@
+<title>Bản đồ Chiến lược Xuất khẩu</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;0,700;0,800;1,500&family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap">
+<style>
+:root{
+  --bg:#F6F4EC; --surface:#FFFFFF; --surface2:#FBFAF4;
+  --ink:#1B2620; --muted:#5D6B62; --faint:#8A968C;
+  --line:#E4E0D3; --line2:#EFECE1;
+  --navy:#123A4B; --navy-ink:#EAF1F0;
+  --gold:#B9862F; --gold-soft:#F1E4C8;
+  --green:#2C7A4B; --green-soft:#DDEEE1;
+  --teal:#0C7573; --teal-soft:#D5EAE8;
+  --good:#2C7A4B; --warn:#C6862A; --crit:#B23A32;
+  --shadow:0 1px 2px rgba(20,30,25,.04),0 6px 20px rgba(20,30,25,.06);
+  --shadow-lg:0 8px 40px rgba(18,58,75,.14);
+  --r:14px; --r-sm:9px;
+  --maxw:1140px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1417; --surface:#161F23; --surface2:#131B1F;
+    --ink:#E9E7DC; --muted:#9DAAA0; --faint:#71807650;
+    --line:#26312F; --line2:#1E2826;
+    --navy:#0C2C3A; --navy-ink:#DCEBEA;
+    --gold:#D6A24B; --gold-soft:#33291680;
+    --green:#57B37C; --green-soft:#16281D;
+    --teal:#39ADA8; --teal-soft:#0E2725;
+    --good:#57B37C; --warn:#DEA347; --crit:#E1685F;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 26px rgba(0,0,0,.35);
+    --shadow-lg:0 10px 44px rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1417; --surface:#161F23; --surface2:#131B1F;
+  --ink:#E9E7DC; --muted:#9DAAA0; --faint:#71807650;
+  --line:#26312F; --line2:#1E2826;
+  --navy:#0C2C3A; --navy-ink:#DCEBEA;
+  --gold:#D6A24B; --gold-soft:#33291680;
+  --green:#57B37C; --green-soft:#16281D;
+  --teal:#39ADA8; --teal-soft:#0E2725;
+  --good:#57B37C; --warn:#DEA347; --crit:#E1685F;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 26px rgba(0,0,0,.35);
+  --shadow-lg:0 10px 44px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Be Vietnam Pro",system-ui,sans-serif;
+  font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 22px}
+h1,h2,h3{font-family:"Spectral",Georgia,serif;font-weight:700;text-wrap:balance;margin:0}
+.mono-num{font-variant-numeric:tabular-nums}
+
+/* ---------- NAV ---------- */
+nav{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 86%,transparent);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav-in{max-width:var(--maxw);margin:0 auto;padding:9px 22px;display:flex;align-items:center;gap:18px}
+.brand{font-family:"Spectral",serif;font-weight:800;font-size:16px;letter-spacing:.2px;white-space:nowrap}
+.brand b{color:var(--gold)}
+.nav-links{display:flex;gap:2px;margin-left:auto;flex-wrap:wrap}
+.nav-links a{font-size:12.5px;font-weight:600;color:var(--muted);text-decoration:none;
+  padding:6px 10px;border-radius:8px;transition:.15s;white-space:nowrap}
+.nav-links a:hover{color:var(--ink);background:var(--surface2)}
+.theme-btn{border:1px solid var(--line);background:var(--surface);color:var(--muted);
+  width:34px;height:30px;border-radius:8px;cursor:pointer;font-size:14px;display:grid;place-items:center;flex:none}
+.theme-btn:hover{color:var(--ink);border-color:var(--gold)}
+@media(max-width:820px){.nav-links{display:none}}
+
+/* ---------- HERO ---------- */
+.hero{position:relative;overflow:hidden;background:var(--navy);color:var(--navy-ink);
+  border-bottom:3px solid var(--gold)}
+.hero-grid{position:absolute;inset:0;opacity:.5;pointer-events:none}
+.hero-in{position:relative;max-width:var(--maxw);margin:0 auto;padding:62px 22px 54px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:2.4px;text-transform:uppercase;
+  color:var(--gold);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.eyebrow::before{content:"";width:26px;height:2px;background:var(--gold)}
+.hero h1{font-size:clamp(30px,5.4vw,52px);line-height:1.04;font-weight:800;letter-spacing:-.5px;max-width:16ch}
+.hero h1 em{font-style:italic;color:var(--gold);font-weight:700}
+.hero p.lead{margin:20px 0 0;max-width:58ch;font-size:16.5px;color:color-mix(in srgb,var(--navy-ink) 82%,transparent);line-height:1.62}
+.statband{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:40px;
+  background:color-mix(in srgb,var(--navy-ink) 16%,transparent);border-radius:var(--r);overflow:hidden}
+.stat{background:var(--navy);padding:18px 18px 16px}
+.stat .n{font-family:"Spectral",serif;font-size:30px;font-weight:800;line-height:1;color:#fff}
+.stat .n small{font-size:15px;color:var(--gold);font-weight:700}
+.stat .l{font-size:12px;color:color-mix(in srgb,var(--navy-ink) 70%,transparent);margin-top:7px;line-height:1.35}
+@media(max-width:680px){.statband{grid-template-columns:repeat(2,1fr)}}
+
+/* ---------- SECTION SHELL ---------- */
+section{padding:56px 0}
+.sec-head{display:flex;align-items:flex-end;gap:16px;margin-bottom:26px;flex-wrap:wrap}
+.sec-tag{font-family:"Spectral",serif;font-style:italic;font-size:15px;color:var(--gold);font-weight:600}
+.sec-head h2{font-size:clamp(23px,3.4vw,32px);line-height:1.1;letter-spacing:-.3px}
+.sec-head p{margin:6px 0 0;color:var(--muted);font-size:14.5px;max-width:64ch}
+.divider{height:1px;background:var(--line);border:0;max-width:var(--maxw);margin:0 auto}
+
+/* ---------- TABS ---------- */
+.tabs{display:inline-flex;background:var(--surface2);border:1px solid var(--line);
+  border-radius:11px;padding:4px;gap:4px;margin-bottom:22px}
+.tab{border:0;background:transparent;font-family:inherit;font-size:13.5px;font-weight:600;
+  color:var(--muted);padding:8px 16px;border-radius:8px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:7px}
+.tab[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.tab .dot{width:8px;height:8px;border-radius:50%}
+.tab.fruit .dot{background:var(--green)}.tab.sea .dot{background:var(--teal)}
+
+/* ---------- PRODUCT CARDS ---------- */
+.pm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px}
+.pcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);
+  box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}
+.pcard-top{padding:16px 18px 14px;border-bottom:1px solid var(--line2);position:relative}
+.pcard-top::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px}
+.pcard.fruit .pcard-top::before{background:var(--green)}
+.pcard.sea .pcard-top::before{background:var(--teal)}
+.pcard h3{font-size:19px;letter-spacing:-.2px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.hs{font-family:"Be Vietnam Pro";font-size:11px;font-weight:600;color:var(--muted);
+  background:var(--surface2);border:1px solid var(--line);padding:2px 7px;border-radius:6px;white-space:nowrap}
+.growth{margin-top:10px;display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;
+  padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px}
+.g-veryhigh{background:var(--green-soft);color:var(--green)}
+.g-high{background:var(--gold-soft);color:var(--gold)}
+.g-mid{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.pcard-body{padding:4px 18px 16px;display:flex;flex-direction:column;gap:11px;flex:1}
+.frow{display:grid;grid-template-columns:74px 1fr;gap:10px;font-size:13px;padding-top:11px;border-top:1px dashed var(--line2)}
+.frow:first-child{border-top:0}
+.frow .k{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--faint);padding-top:2px}
+.frow .v{color:var(--ink);line-height:1.5}
+.frow .v.adv{color:var(--green);font-weight:500}
+.pcard.sea .frow .v.adv{color:var(--teal)}
+.frow .v.risk{color:var(--crit)}
+.tagrow{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
+.tg{font-size:11px;font-weight:600;color:var(--muted);background:var(--surface2);
+  border:1px solid var(--line);border-radius:6px;padding:2px 7px}
+
+/* ---------- ADVANTAGE (Section B) ---------- */
+.adv-list{display:flex;flex-direction:column;gap:10px}
+.acc{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.acc-h{width:100%;text-align:left;border:0;background:transparent;cursor:pointer;font-family:inherit;
+  padding:15px 18px;display:flex;align-items:center;gap:13px;color:var(--ink)}
+.acc-h:hover{background:var(--surface2)}
+.acc-badge{width:9px;height:34px;border-radius:5px;flex:none}
+.acc.fruit .acc-badge{background:var(--green)}.acc.sea .acc-badge{background:var(--teal)}
+.acc-h .nm{font-family:"Spectral",serif;font-weight:700;font-size:18px}
+.acc-h .sub{font-size:12.5px;color:var(--muted);margin-left:2px}
+.acc-h .chev{margin-left:auto;color:var(--faint);transition:.2s;font-size:13px}
+.acc[open-state="1"] .chev{transform:rotate(180deg)}
+.acc-panel{display:none;padding:2px 18px 18px}
+.acc[open-state="1"] .acc-panel{display:block}
+.dim-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:11px}
+.dim{background:var(--surface2);border:1px solid var(--line2);border-radius:var(--r-sm);padding:11px 13px}
+.dim .dh{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--gold);
+  display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.dim .dt{font-size:12.5px;line-height:1.5;color:var(--ink)}
+.dim.weak{background:color-mix(in srgb,var(--crit) 7%,var(--surface2));border-color:color-mix(in srgb,var(--crit) 22%,var(--line2))}
+.dim.weak .dh{color:var(--crit)}
+
+/* ---------- MARKETS (Section C) ---------- */
+.filterbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.filterbar .fl{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--faint)}
+.chip{border:1px solid var(--line);background:var(--surface);font-family:inherit;font-size:12.5px;font-weight:600;
+  color:var(--muted);padding:6px 13px;border-radius:20px;cursor:pointer;transition:.15s}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip:hover{border-color:var(--gold)}
+.mkt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.mcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);
+  overflow:hidden;display:flex;flex-direction:column;transition:.2s}
+.mcard.hide{display:none}
+.mcard-h{padding:16px 18px;cursor:pointer;display:flex;flex-direction:column;gap:12px}
+.mcard-h:hover{background:var(--surface2)}
+.mtop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.mcard h3{font-size:19px;letter-spacing:-.2px;line-height:1.15}
+.mcard .flag{font-size:12px;color:var(--muted);font-weight:600;margin-top:2px}
+.prio{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;padding:4px 10px;border-radius:20px;white-space:nowrap;flex:none}
+.prio.cao{background:var(--green-soft);color:var(--green)}
+.prio.tb{background:color-mix(in srgb,var(--warn) 15%,transparent);color:var(--warn)}
+.msize{font-size:13px;color:var(--muted);line-height:1.5}
+.mbest{display:flex;flex-wrap:wrap;gap:5px}
+.mbest .tg{border-color:var(--gold);color:var(--gold);background:var(--gold-soft)}
+.mcard-detail{display:none;border-top:1px solid var(--line2);padding:15px 18px 17px;background:var(--surface2)}
+.mcard[open-state="1"] .mcard-detail{display:block}
+.mcard[open-state="1"]{box-shadow:var(--shadow-lg);border-color:var(--gold)}
+.drow{display:grid;grid-template-columns:120px 1fr;gap:12px;padding:9px 0;border-top:1px dashed var(--line);font-size:13px}
+.drow:first-child{border-top:0;padding-top:2px}
+.drow .k{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--faint)}
+.drow .v{line-height:1.5}
+.drow .v.risk{color:var(--crit)}
+.strat{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:13px}
+.strat .sbox{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:11px 13px}
+.strat .sbox .sh{font-size:10.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;margin-bottom:6px}
+.strat .sbox.s1 .sh{color:var(--gold)}.strat .sbox.s2 .sh{color:var(--teal)}
+.strat .sbox .st{font-size:12.5px;line-height:1.5}
+.expand-hint{font-size:11px;color:var(--faint);font-weight:600;margin-top:2px;display:flex;align-items:center;gap:5px}
+@media(max-width:560px){.strat{grid-template-columns:1fr}.drow{grid-template-columns:1fr}.drow .k{margin-bottom:-4px}}
+
+/* ---------- MATRIX (Section D) ---------- */
+.matrix-wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:start}
+@media(max-width:900px){.matrix-wrap{grid-template-columns:1fr}}
+.plot-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:20px}
+.plot-axtitle{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--faint);text-align:center;margin-bottom:8px}
+.plot{position:relative;width:100%;aspect-ratio:1/1;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface2)}
+.quad{position:absolute;width:50%;height:50%;padding:11px 13px;font-family:"Spectral",serif}
+.quad .qn{font-size:13px;font-weight:700}
+.quad .qd{font-size:10.5px;color:var(--muted);font-family:"Be Vietnam Pro";margin-top:2px;line-height:1.3;max-width:20ch}
+.q-tl{top:0;left:0;background:color-mix(in srgb,var(--teal) 8%,transparent)}
+.q-tr{top:0;right:0;background:color-mix(in srgb,var(--green) 11%,transparent)}
+.q-bl{bottom:0;left:0;background:color-mix(in srgb,var(--crit) 7%,transparent)}
+.q-br{bottom:0;right:0;background:color-mix(in srgb,var(--warn) 10%,transparent);text-align:right}
+.q-tl .qn{color:var(--teal)}.q-tr .qn{color:var(--green)}.q-bl .qn{color:var(--crit)}.q-br .qn{color:var(--warn)}
+.q-br{display:flex;flex-direction:column;align-items:flex-end}
+.axis-x{width:50%;left:25%}
+.gridline{position:absolute;background:var(--line)}
+.gl-v{width:1px;height:100%;left:50%}.gl-h{height:1px;width:100%;top:50%}
+.dot-pt{position:absolute;width:15px;height:15px;border-radius:50%;transform:translate(-50%,50%);
+  border:2px solid var(--surface);cursor:pointer;transition:.15s;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.dot-pt:hover,.dot-pt.on{transform:translate(-50%,50%) scale(1.5);z-index:6}
+.dot-pt.attack{background:var(--green)}.dot-pt.keep{background:#2E86C1}
+.dot-pt.invest{background:var(--warn)}.dot-pt.limit{background:var(--crit)}
+.axlabel{position:absolute;font-size:10px;color:var(--faint);font-weight:600}
+.tip{position:fixed;z-index:99;background:var(--ink);color:var(--bg);font-size:12px;font-weight:600;
+  padding:6px 10px;border-radius:8px;pointer-events:none;opacity:0;transition:opacity .12s;max-width:220px;box-shadow:var(--shadow-lg)}
+.tip .tg2{font-size:10px;font-weight:700;opacity:.75;display:block;text-transform:uppercase;letter-spacing:.4px}
+.mx-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px;justify-content:center}
+.mx-legend span{font-size:11.5px;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:6px}
+.mx-legend i{width:11px;height:11px;border-radius:50%}
+.grp{margin-bottom:14px}
+.grp-h{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.grp-h .gi{width:11px;height:11px;border-radius:50%;flex:none}
+.grp-h .gt{font-family:"Spectral",serif;font-weight:700;font-size:16px}
+.grp-h .gc{font-size:11px;font-weight:700;color:var(--faint);background:var(--surface2);border:1px solid var(--line);
+  padding:1px 8px;border-radius:20px}
+.mrow{display:flex;align-items:baseline;gap:10px;padding:7px 0 7px 20px;border-top:1px solid var(--line2);font-size:13px}
+.mrow:first-of-type{border-top:0}
+.mrow .mn{font-weight:600;color:var(--ink);flex:none;min-width:0}
+.mrow .ma{color:var(--muted);font-size:12.5px;line-height:1.45}
+.mrow .sc{font-family:"Be Vietnam Pro";font-weight:800;font-size:13px;color:var(--gold);flex:none}
+
+/* ---------- ROADMAP (Section E) ---------- */
+.timeline{position:relative;padding-left:8px}
+.phase{position:relative;padding:0 0 8px 40px;margin-bottom:24px}
+.phase::before{content:"";position:absolute;left:11px;top:6px;bottom:-24px;width:2px;background:var(--line)}
+.phase:last-child::before{display:none}
+.phase-dot{position:absolute;left:0;top:2px;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;
+  font-family:"Spectral",serif;font-weight:800;font-size:12px;color:#fff}
+.phase.p1 .phase-dot{background:var(--green)}.phase.p2 .phase-dot{background:var(--warn)}.phase.p3 .phase-dot{background:var(--navy)}
+.phase-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.phase-top{padding:15px 20px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--line2)}
+.phase-yr{font-family:"Spectral",serif;font-weight:800;font-size:20px}
+.phase.p1 .phase-yr{color:var(--green)}.phase.p2 .phase-yr{color:var(--warn)}.phase.p3 .phase-yr{color:var(--navy)}
+:root[data-theme="dark"] .phase.p3 .phase-yr{color:var(--teal)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .phase.p3 .phase-yr{color:var(--teal)}}
+.phase-theme{font-size:13.5px;font-weight:600;color:var(--muted)}
+.phase-body{display:grid;grid-template-columns:1fr 1fr;gap:0}
+@media(max-width:720px){.phase-body{grid-template-columns:1fr}}
+.pcol{padding:15px 20px}
+.pcol+.pcol{border-left:1px solid var(--line2)}
+@media(max-width:720px){.pcol+.pcol{border-left:0;border-top:1px solid var(--line2)}}
+.pcol .ch{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px;display:flex;align-items:center;gap:7px}
+.pcol.fr .ch{color:var(--green)}.pcol.se .ch{color:var(--teal)}
+.pcol ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px}
+.pcol li{font-size:13px;line-height:1.45;padding-left:16px;position:relative}
+.pcol li::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;background:var(--gold)}
+.kpi{padding:13px 20px;background:var(--surface2);border-top:1px solid var(--line2);display:flex;gap:10px;align-items:flex-start}
+.kpi .kl{font-size:10.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--gold);flex:none;padding-top:2px}
+.kpi .kt{font-size:12.5px;color:var(--ink);line-height:1.5}
+
+/* ---------- FOOTER ---------- */
+/* ---------- KIM NGACH / CHARTS ---------- */
+.kn-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:820px){.kn-grid{grid-template-columns:1fr}}
+.chart-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:18px 20px}
+.chart-card.span2{grid-column:1/-1}
+.chart-card h3{font-size:16px;letter-spacing:-.2px;margin-bottom:3px}
+.chart-card .csub{font-size:12px;color:var(--muted);margin-bottom:16px}
+.bars{display:flex;flex-direction:column;gap:11px}
+.bar-row{display:grid;grid-template-columns:118px 1fr;gap:12px;align-items:center}
+.bar-row .bl{font-size:12.5px;font-weight:600;text-align:right;color:var(--ink);line-height:1.2}
+.bar-track{position:relative;height:26px;background:var(--surface2);border-radius:7px;overflow:hidden}
+.bar-fill{position:absolute;left:0;top:0;bottom:0;border-radius:7px;display:flex;align-items:center;justify-content:flex-end;
+  padding-right:9px;color:#fff;font-size:11.5px;font-weight:800;font-variant-numeric:tabular-nums;min-width:34px;
+  transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.bar-fill.fr{background:linear-gradient(90deg,var(--green),color-mix(in srgb,var(--green) 70%,var(--gold)))}
+.bar-fill.se{background:linear-gradient(90deg,var(--teal),color-mix(in srgb,var(--teal) 60%,#2E86C1))}
+.chart-note{font-size:11px;color:var(--faint);margin-top:14px;line-height:1.4}
+.donut-wrap{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.legend2{display:flex;flex-direction:column;gap:6px;font-size:12px}
+.legend2 .li{display:flex;align-items:center;gap:8px}
+.legend2 .sw{width:11px;height:11px;border-radius:3px;flex:none}
+.legend2 .lv{margin-left:auto;font-weight:800;font-variant-numeric:tabular-nums;color:var(--muted)}
+.traj{display:flex;align-items:flex-end;gap:10px;height:150px;padding-top:10px}
+.traj .tcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;justify-content:flex-end;height:100%}
+.traj .tbar{width:100%;max-width:46px;border-radius:7px 7px 0 0;background:linear-gradient(180deg,var(--gold),color-mix(in srgb,var(--gold) 55%,var(--green)));
+  position:relative;transition:height .9s cubic-bezier(.2,.8,.2,1)}
+.traj .tv{font-size:11px;font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums}
+.traj .ty{font-size:11px;color:var(--muted);font-weight:600}
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:2px}
+@media(max-width:680px){.kpi-strip{grid-template-columns:repeat(2,1fr)}}
+.kpi-tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:15px 16px;box-shadow:var(--shadow)}
+.kpi-tile .kv{font-family:"Spectral",serif;font-size:26px;font-weight:800;line-height:1;color:var(--gold)}
+.kpi-tile .kk{font-size:12px;color:var(--muted);margin-top:7px;line-height:1.35}
+/* ---------- BUYER & GIA ---------- */
+.byr-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:820px){.byr-grid{grid-template-columns:1fr}}
+.byr-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.byr-top{padding:14px 18px;border-bottom:1px solid var(--line2);display:flex;align-items:center;gap:10px}
+.byr-top .fg{font-size:22px}
+.byr-top h3{font-size:18px}
+.byr-top.eu{background:var(--green-soft)}.byr-top.us{background:color-mix(in srgb,#2E86C1 12%,transparent)}
+.byr-body{padding:6px 18px 16px}
+.byr-ch{padding:11px 0;border-top:1px dashed var(--line2)}
+.byr-ch:first-child{border-top:0}
+.byr-ch .ct{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--gold);margin-bottom:5px}
+.byr-ch .cc{font-size:12.5px;line-height:1.5;color:var(--ink)}
+.rbar-row{display:grid;grid-template-columns:118px 1fr 78px;gap:11px;align-items:center;padding:6px 0}
+.rbar-row .rl{font-size:12px;font-weight:600;text-align:right;line-height:1.15}
+.rbar-track{position:relative;height:18px;background:var(--surface2);border-radius:6px;overflow:hidden}
+.rbar-seg{position:absolute;top:0;bottom:0;border-radius:6px;background:linear-gradient(90deg,color-mix(in srgb,var(--gold) 55%,var(--green)),var(--gold))}
+.rbar-row .rv{font-size:11.5px;font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums}
+.rbar-scale{display:flex;justify-content:space-between;font-size:10px;color:var(--faint);margin:4px 0 0 129px;font-variant-numeric:tabular-nums}
+/* ---------- CHECKLIST ---------- */
+.ck-progress{display:flex;align-items:center;gap:14px;margin-bottom:20px;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--r);padding:14px 18px;box-shadow:var(--shadow)}
+.ck-progress .pt{position:relative;flex:1;height:12px;background:var(--surface2);border-radius:20px;overflow:hidden}
+.ck-progress .pf{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--green),var(--teal));
+  border-radius:20px;transition:width .4s ease;width:0}
+.ck-progress .pn{font-size:13px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.ck-progress .reset{border:1px solid var(--line);background:var(--surface);color:var(--muted);font-family:inherit;
+  font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.ck-progress .reset:hover{color:var(--crit);border-color:var(--crit)}
+.ck-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:820px){.ck-grid{grid-template-columns:1fr}}
+.ck-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.ck-head{padding:13px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line2)}
+.ck-head .ci{width:8px;height:26px;border-radius:5px;flex:none}
+.ck-head h3{font-size:16px}
+.ck-head.a .ci{background:var(--green)}.ck-head.b .ci{background:#2E86C1}.ck-head.c .ci{background:var(--crit)}.ck-head.d .ci{background:var(--gold)}
+.ck-list{padding:6px 8px 10px}
+.ck-item{display:flex;gap:11px;padding:9px 10px;border-radius:9px;cursor:pointer;transition:.12s;align-items:flex-start}
+.ck-item:hover{background:var(--surface2)}
+.ck-box{width:19px;height:19px;border:2px solid var(--line);border-radius:6px;flex:none;margin-top:1px;
+  display:grid;place-items:center;transition:.12s;font-size:12px;color:#fff}
+.ck-item.done .ck-box{background:var(--green);border-color:var(--green)}
+.ck-item.done .ck-txt{color:var(--faint);text-decoration:line-through}
+.ck-txt{font-size:13px;line-height:1.45}
+.ck-txt .lv{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;padding:1px 6px;border-radius:5px;margin-left:6px;white-space:nowrap;vertical-align:middle}
+.lv-req{background:color-mix(in srgb,var(--crit) 14%,transparent);color:var(--crit)}
+.lv-cond{background:var(--gold-soft);color:var(--gold)}
+.lv-opt{background:var(--green-soft);color:var(--green)}
+.ck-txt .rf{display:block;font-size:11px;color:var(--faint);margin-top:2px}
+/* ---------- QUY TRINH (stepper) ---------- */
+.qt-phase{position:relative;padding-left:42px;margin-bottom:10px}
+.qt-phase::before{content:"";position:absolute;left:15px;top:34px;bottom:-10px;width:2px;background:var(--line)}
+.qt-phase:last-child::before{display:none}
+.qt-badge{position:absolute;left:0;top:3px;width:32px;height:32px;border-radius:9px;display:grid;place-items:center;
+  font-family:"Spectral",serif;font-weight:800;font-size:15px;color:#fff}
+.qt-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px;cursor:pointer}
+.qt-head .qh{font-family:"Spectral",serif;font-weight:700;font-size:18px;letter-spacing:-.2px}
+.qt-head .qtime{font-size:11.5px;font-weight:700;color:var(--muted);background:var(--surface2);border:1px solid var(--line);
+  padding:2px 9px;border-radius:20px;white-space:nowrap}
+.qt-steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin-bottom:8px}
+.qt-step{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:12px 14px;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;gap:5px;transition:.15s}
+.qt-step:hover{border-color:var(--gold);box-shadow:var(--shadow-lg)}
+.qt-step .sn{display:flex;align-items:center;gap:8px}
+.qt-step .snum{width:22px;height:22px;border-radius:6px;background:var(--gold-soft);color:var(--gold);
+  font-size:12px;font-weight:800;display:grid;place-items:center;flex:none}
+.qt-step .stt{font-size:13px;font-weight:700;line-height:1.25}
+.qt-step .sout{font-size:11.5px;color:var(--muted);line-height:1.4}
+.qt-step .slink{font-size:11px;font-weight:700;color:var(--teal);text-decoration:none;margin-top:2px;display:inline-flex;align-items:center;gap:4px}
+.qt-step .slink:hover{text-decoration:underline}
+.qt-p0 .qt-badge,.qt-p0 .snum{background:var(--green)}.qt-p0 .snum{color:#fff}
+.qt-p1 .qt-badge{background:#2E86C1}.qt-p2 .qt-badge{background:var(--crit)}
+.qt-p3 .qt-badge{background:var(--warn)}.qt-p4 .qt-badge{background:#7D3C98}.qt-p5 .qt-badge{background:var(--navy)}
+footer{border-top:1px solid var(--line);padding:30px 0 50px;color:var(--muted);font-size:12.5px}
+.foot-in{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+footer b{color:var(--ink);font-weight:700}
+.src{font-size:11.5px;color:var(--faint);max-width:60ch;line-height:1.5;margin-top:4px}
+</style>
+
+<nav>
+  <div class="nav-in">
+    <span class="brand">Bản đồ <b>Chiến lược</b> XK 2026–2030</span>
+    <div class="nav-links">
+      <a href="#quytrinh">Quy trình</a>
+      <a href="#pm">Product Mapping</a>
+      <a href="#loithe">Lợi thế</a>
+      <a href="#kimngach">Kim ngạch</a>
+      <a href="#thitruong">8 Thị trường</a>
+      <a href="#buyer">Buyer &amp; Giá</a>
+      <a href="#checklist">Checklist</a>
+      <a href="#matran">Ma trận ưu tiên</a>
+      <a href="#lotrinh">Lộ trình</a>
+    </div>
+    <button class="theme-btn" id="themeBtn" aria-label="Đổi giao diện sáng/tối">◐</button>
+  </div>
+</nav>
+
+<header class="hero">
+  <canvas class="hero-grid" id="heroCanvas"></canvas>
+  <div class="hero-in">
+    <div class="eyebrow">Trái cây &amp; Thủy sản Việt Nam · 2026–2030</div>
+    <h1>Bản đồ chiến lược <em>xuất khẩu</em> theo nhóm hàng &amp; quốc gia</h1>
+    <p class="lead">Product mapping, lợi thế cạnh tranh, phân tích 8 thị trường trọng điểm, ma trận ưu tiên và lộ trình 3 giai đoạn — dựng để doanh nghiệp triển khai ngay, tận dụng FTA và nâng cấp giá trị.</p>
+    <div class="statband">
+      <div class="stat"><div class="n">11</div><div class="l">Nhóm hàng chủ lực<br>(6 trái cây · 5 thủy sản)</div></div>
+      <div class="stat"><div class="n">8</div><div class="l">Thị trường trọng điểm được phân tích sâu</div></div>
+      <div class="stat"><div class="n">8<small>+</small></div><div class="l">FTA đòn bẩy: EVFTA, CPTPP, RCEP, UKVFTA…</div></div>
+      <div class="stat"><div class="n">3</div><div class="l">Giai đoạn lộ trình: Tấn công → Nâng cấp → Cao cấp</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ QUY TRINH THUC THI ============ -->
+<section id="quytrinh"><div class="wrap">
+  <div class="sec-head">
+    <div>
+      <div class="sec-tag">Bắt đầu ở đây</div>
+      <h2>Quy trình thực thi xuất khẩu — step by step</h2>
+      <p>Hệ thống toàn bộ thành lộ trình hành động: 6 giai đoạn · 18 bước, từ chuẩn bị nền tảng đến nâng cấp &amp; mở rộng. Mỗi bước liên kết tới khối tài liệu hỗ trợ bên dưới.</p>
+    </div>
+  </div>
+  <div id="qtWrap"></div>
+</div></section>
+<hr class="divider">
+
+<!-- ============ A. PRODUCT MAPPING ============ -->
+<section id="pm"><div class="wrap">
+  <div class="sec-head">
+    <div>
+      <div class="sec-tag">Khối A</div>
+      <h2>Product Mapping — bản đồ sản phẩm</h2>
+      <p>Mã HS · dạng sản phẩm · phân khúc · mùa vụ · đối thủ · lợi thế cốt lõi · rào cản · tiềm năng tăng trưởng.</p>
+    </div>
+  </div>
+  <div class="tabs" role="tablist">
+    <button class="tab fruit" role="tab" aria-selected="true" data-grp="fruit"><span class="dot"></span>Trái cây</button>
+    <button class="tab sea" role="tab" aria-selected="false" data-grp="sea"><span class="dot"></span>Thủy sản</button>
+  </div>
+  <div class="pm-grid" id="pmGrid"></div>
+</div></section>
+<hr class="divider">
+
+<!-- ============ B. ADVANTAGES ============ -->
+<section id="loithe"><div class="wrap">
+  <div class="sec-head">
+    <div>
+      <div class="sec-tag">Khối B</div>
+      <h2>Lợi thế từng nhóm hàng</h2>
+      <p>Khung 7 chiều: tự nhiên · chi phí · chứng nhận &amp; truy xuất · logistics &amp; vị trí · FTA · chế biến sâu · điểm yếu cần khắc phục. Nhấn để mở rộng.</p>
+    </div>
+  </div>
+  <div class="adv-list" id="advList"></div>
+</div></section>
+<hr class="divider">
+
+<!-- ============ KIM NGACH ============ -->
+<section id="kimngach"><div class="wrap">
+  <div class="sec-head">
+    <div>
+      <div class="sec-tag">Số liệu</div>
+      <h2>Kim ngạch xuất khẩu &amp; tăng trưởng</h2>
+      <p>Ước tính định hướng (tỷ USD) tổng hợp từ VASEP, Bộ NN&amp;PTNT, Tổng cục Hải quan, ITC Trademap — dùng để định vị ưu tiên, cần đối chiếu báo cáo chính thức trước khi ra quyết định.</p>
+    </div>
+  </div>
+  <div class="kpi-strip">
+    <div class="kpi-tile"><div class="kv">~3,6 tỷ</div><div class="kk">Sầu riêng 2025 (ước) — đầu tàu trái cây</div></div>
+    <div class="kpi-tile"><div class="kv">~4,3 tỷ</div><div class="kk">Tôm 2025 (ước) — đầu tàu thủy sản</div></div>
+    <div class="kpi-tile"><div class="kv">~20%</div><div class="kk">CAGR trái cây sấy 2025–2030 (ước)</div></div>
+    <div class="kpi-tile"><div class="kv">65%</div><div class="kk">Tỷ trọng trái cây xuất sang Trung Quốc — rủi ro tập trung</div></div>
+  </div>
+  <div class="kn-grid" style="margin-top:16px">
+    <div class="chart-card">
+      <h3>Trái cây theo nhóm — 2025 (ước)</h3><div class="csub">Tỷ USD · gồm cả sản phẩm chế biến (dừa)</div>
+      <div class="bars" id="barsFruit"></div>
+    </div>
+    <div class="chart-card">
+      <h3>Thủy sản theo nhóm — 2025 (ước)</h3><div class="csub">Tỷ USD</div>
+      <div class="bars" id="barsSea"></div>
+    </div>
+    <div class="chart-card">
+      <h3>Cơ cấu thị trường 2024</h3><div class="csub">Tỷ trọng % kim ngạch</div>
+      <div class="donut-wrap" style="margin-bottom:14px"><canvas id="donutFruit" width="120" height="120" style="width:110px;height:110px"></canvas>
+        <div class="legend2" id="legFruit"></div></div>
+      <div class="donut-wrap"><canvas id="donutSea" width="120" height="120" style="width:110px;height:110px"></canvas>
+        <div class="legend2" id="legSea"></div></div>
+    </div>
+    <div class="chart-card">
+      <h3>Trái cây sấy — quỹ đạo 2025→2030</h3><div class="csub">Triệu USD · CAGR ~20% (ước)</div>
+      <div class="traj" id="trajDried"></div>
+      <div class="chart-note">Nhóm value-added biên lợi nhuận cao, ít rào cản kiểm dịch — mũi nhọn mở rộng sang Mỹ, EU, Trung Đông.</div>
+    </div>
+    <div class="chart-card span2">
+      <h3>Mục tiêu kim ngạch 2 nhóm: 2025 → 2030</h3><div class="csub">Tỷ USD (mục tiêu định hướng)</div>
+      <div class="bars" id="barsTarget"></div>
+    </div>
+  </div>
+</div></section>
+<hr class="divider">
+
+<!-- ============ C. MARKETS ============ -->
+<section id="thitruong"><div class="wrap">
+  <div class="sec-head">
+    <div>
+      <div class="sec-tag">Khối C</div>
+      <h2>Bản đồ 8 thị trường quốc gia</h2>
+      <p>Quy mô · sản phẩm lợi thế · kênh phân phối · buyer &amp; hành vi · thuế FTA · rào cản · chiến lược ngắn/trung hạn. Nhấn từng thẻ để xem chi tiết.</p>
+    </div>
+  </div>
+  <div class="filterbar">
+    <span class="fl">Lọc ưu tiên:</span>
+    <button class="chip" data-f="all" aria-pressed="true">Tất cả</button>
+    <button class="chip" data-f="cao" aria-pressed="false">Ưu tiên Cao</button>
+    <button class="chip" data-f="tb" aria-pressed="false">Trung bình</button>
+  </div>
+  <div class="mkt-grid" id="mktGrid"></div>
+</div></section>
+<hr class="divider">
+
+<!-- ============ BUYER & GIA ============ -->
+<section id="buyer"><div class="wrap">
+  <div class="sec-head">
+    <div>
+      <div class="sec-tag">Đào sâu · Trái cây sấy</div>
+      <h2>Buyer mục tiêu EU – Mỹ &amp; giá FOB tham khảo</h2>
+      <p>Danh mục kênh &amp; đối tác tiêu biểu để nghiên cứu/tiếp cận — <b>không phải xác nhận đã mua hàng Việt Nam</b>; tự xác minh liên hệ &amp; nhu cầu. Giá là khoảng định hướng, không phải báo giá.</p>
+    </div>
+  </div>
+  <div class="byr-grid">
+    <div class="byr-card">
+      <div class="byr-top eu"><span class="fg">🇪🇺</span><h3>Buyer mục tiêu tại EU</h3></div>
+      <div class="byr-body" id="byrEU"></div>
+    </div>
+    <div class="byr-card">
+      <div class="byr-top us"><span class="fg">🇺🇸</span><h3>Buyer mục tiêu tại Hoa Kỳ</h3></div>
+      <div class="byr-body" id="byrUS"></div>
+    </div>
+  </div>
+  <div class="kn-grid" style="margin-top:16px">
+    <div class="chart-card">
+      <h3>Giá FOB tham khảo (USD/kg)</h3><div class="csub">Khoảng dao động theo quy cách, sản lượng, chứng nhận</div>
+      <div id="fobBars"></div>
+      <div class="rbar-scale"><span>0</span><span>15</span><span>30</span><span>45</span></div>
+    </div>
+    <div class="chart-card">
+      <h3>Cơ cấu chi phí — Xoài sấy dẻo</h3><div class="csub">% giá thành FOB (điển hình)</div>
+      <div class="donut-wrap"><canvas id="donutCost" width="120" height="120" style="width:120px;height:120px"></canvas>
+        <div class="legend2" id="legCost"></div></div>
+      <div class="chart-note">FD (thăng hoa) có tỷ trọng năng lượng &amp; khấu hao thiết bị cao hơn hẳn sấy dẻo → giá FOB cao hơn nhiều.</div>
+    </div>
+  </div>
+</div></section>
+<hr class="divider">
+
+<!-- ============ CHECKLIST ============ -->
+<section id="checklist"><div class="wrap">
+  <div class="sec-head">
+    <div>
+      <div class="sec-tag">Thực thi · Trái cây sấy</div>
+      <h2>Checklist hồ sơ xuất khẩu — EU &amp; Hoa Kỳ</h2>
+      <p>Từng bước: nền tảng nhà máy &amp; sản phẩm → EU (BRCGS/EUDR) → Hoa Kỳ (FDA/FSVP) → chứng từ lô hàng. Tick để theo dõi — tiến độ lưu ngay trên trình duyệt của bạn.</p>
+    </div>
+  </div>
+  <div class="ck-progress">
+    <span class="pn" id="ckPct">0%</span>
+    <div class="pt"><div class="pf" id="ckFill"></div></div>
+    <span class="pn" id="ckCount" style="color:var(--muted)">0/0</span>
+    <button class="reset" id="ckReset">Đặt lại</button>
+  </div>
+  <div class="ck-grid" id="ckGrid"></div>
+</div></section>
+<hr class="divider">
+
+<!-- ============ D. MATRIX ============ -->
+<section id="matran"><div class="wrap">
+  <div class="sec-head">
+    <div>
+      <div class="sec-tag">Khối D</div>
+      <h2>Ma trận ưu tiên chiến lược</h2>
+      <p>Trục ngang: mức hấp dẫn thị trường. Trục dọc: lợi thế cạnh tranh của Việt Nam. Mỗi điểm là một cặp <b>nhóm hàng × thị trường</b>.</p>
+    </div>
+  </div>
+  <div class="matrix-wrap">
+    <div class="plot-card">
+      <div class="plot-axtitle">Lợi thế cạnh tranh VN ↑</div>
+      <div class="plot" id="plot">
+        <div class="gridline gl-v"></div><div class="gridline gl-h"></div>
+        <div class="quad q-tl"><div class="qn">Duy trì</div><div class="qd">Lợi thế cao · thị trường vừa/khó</div></div>
+        <div class="quad q-tr"><div class="qn">Tấn công</div><div class="qd">Cả hai cao — dồn lực ngay</div></div>
+        <div class="quad q-bl"><div class="qn">Hạn chế</div><div class="qd">Cả hai thấp — chọn lọc</div></div>
+        <div class="quad q-br"><div class="qn">Đầu tư dài hạn</div><div class="qd">Thị trường hấp dẫn · lợi thế đang xây</div></div>
+      </div>
+      <div class="plot-axtitle" style="margin-top:8px">Mức hấp dẫn thị trường →</div>
+      <div class="mx-legend">
+        <span><i style="background:var(--green)"></i>Tấn công</span>
+        <span><i style="background:#2E86C1"></i>Duy trì</span>
+        <span><i style="background:var(--warn)"></i>Đầu tư dài hạn</span>
+        <span><i style="background:var(--crit)"></i>Hạn chế</span>
+      </div>
+    </div>
+    <div id="grpList"></div>
+  </div>
+</div></section>
+<hr class="divider">
+
+<!-- ============ E. ROADMAP ============ -->
+<section id="lotrinh"><div class="wrap">
+  <div class="sec-head">
+    <div>
+      <div class="sec-tag">Khối E</div>
+      <h2>Lộ trình chiến lược 2026–2030</h2>
+      <p>Ba giai đoạn: chiếm thị phần bằng lợi thế sẵn có → đa dạng thị trường &amp; nâng cấp value-added → định vị thương hiệu quốc gia cao cấp, bền vững.</p>
+    </div>
+  </div>
+  <div class="timeline" id="timeline"></div>
+</div></section>
+
+<footer><div class="wrap"><div class="foot-in">
+  <div>
+    <b>Bản đồ Chiến lược Xuất khẩu Trái cây &amp; Thủy sản Việt Nam 2026–2030</b><br>
+    <span class="src">Số liệu định hướng chiến lược, tổng hợp từ VASEP, Bộ NN&amp;PTNT, Tổng cục Hải quan, ITC Trademap và xu hướng ngành đến 2026. Doanh nghiệp cần cập nhật kim ngạch/thuế suất thực tế theo mã HS 8–10 số và biểu thuế FTA tại thời điểm ký hợp đồng.</span>
+  </div>
+  <div style="text-align:right">Ưu tiên: <b style="color:var(--good)">■ Cao</b> · <b style="color:var(--warn)">■ Trung bình</b></div>
+</div></div></footer>
+
+<div class="tip" id="tip"></div>
+
+<script>
+/* ================= DATA ================= */
+const PRODUCTS=[
+ {g:"fruit",n:"Sầu riêng",hs:"0810.60 · 0811.90",growth:"veryhigh",gl:"Tăng trưởng rất cao",
+  form:"Tươi nguyên trái · Đông lạnh IQF (nguyên trái/múi) · cơm xay/paste · sấy thăng hoa",
+  seg:["Retail cao cấp","E-commerce/livestream","HORECA","Processing"],
+  season:"Chính vụ T5–T10; rải vụ Tây Nguyên/miền Tây gần như quanh năm",
+  rival:"Thái Lan (Monthong), Malaysia (Musang King), Philippines",
+  adv:"Rải vụ quanh năm · cự ly gần TQ · giá cạnh tranh · đông lạnh giữ trái vụ · giống Ri6 & Dona",
+  risk:"Mã vùng trồng + cơ sở đóng gói GACC · kiểm Cd/kim loại nặng · phụ thuộc ~90% vào TQ"},
+ {g:"fruit",n:"Chuối",hs:"0803.90",growth:"high",gl:"Tăng trưởng cao",
+  form:"Tươi (Cavendish) · sấy dẻo/giòn · bột chuối xanh · đông lạnh",
+  seg:["Retail (TQ/Nhật/Hàn)","Processing","HORECA"],
+  season:"Quanh năm, đỉnh T10–T4",
+  rival:"Philippines (số 1 châu Á), Ecuador, Campuchia",
+  adv:"Gần TQ/Nhật/Hàn · chi phí thấp · vùng trồng lớn · thay thị phần Philippines khi có dịch Panama",
+  risk:"Chuẩn dư lượng Nhật/Hàn khắt khe · cạnh tranh giá Philippines/Ecuador · logistics lạnh"},
+ {g:"fruit",n:"Xoài",hs:"0804.50",growth:"high",gl:"Tăng trưởng cao",
+  form:"Tươi (Cát Chu, Cát Hòa Lộc) · sấy dẻo · IQF · puree/nước ép",
+  seg:["Retail","E-commerce","Processing (puree)"],
+  season:"Chính vụ T3–T6; rải vụ nhờ xử lý ra hoa",
+  rival:"Thái Lan, Ấn Độ, Mexico, Peru, Pakistan",
+  adv:"Đa dạng giống · puree/đông lạnh cạnh tranh · đã mở cửa Mỹ/Úc/Nhật/Hàn/EU",
+  risk:"Ruồi đục quả → chiếu xạ/hơi nước nóng · mã vùng trồng · cạnh tranh giá"},
+ {g:"fruit",n:"Thanh long",hs:"0810.90",growth:"mid",gl:"Tăng trưởng trung bình",
+  form:"Tươi (ruột trắng/đỏ) · đông lạnh · sấy · nước ép · puree",
+  seg:["Retail","Processing","E-commerce"],
+  season:"Quanh năm nhờ chong đèn; đỉnh T5–T9",
+  rival:"Trung Quốc tự trồng tăng nhanh (áp lực lớn nhất)",
+  adv:"Nước XK thanh long số 1 thế giới · vùng Bình Thuận/Long An/Tiền Giang · rải vụ",
+  risk:"TQ tự chủ nguồn cung → giảm cầu · cần chuyển hướng Ấn Độ/EU & chế biến sâu"},
+ {g:"fruit",n:"Dừa",hs:"0801.19 · 2009.89 · 1513.11",growth:"veryhigh",gl:"Tăng trưởng rất cao",
+  form:"Dừa tươi gọt kim cương · nước dừa lon/hộp · cơm dừa sấy · sữa dừa · dầu dừa",
+  seg:["Retail","HORECA","Processing","E-commerce (healthy)"],
+  season:"Quanh năm (Bến Tre, Trà Vinh)",
+  rival:"Thái Lan, Indonesia, Philippines, Sri Lanka",
+  adv:"Vùng NL Bến Tre lớn · chuỗi chế biến sâu đa dạng · mới mở cửa dừa tươi Mỹ (2023) & TQ (2024)",
+  risk:"Cạnh tranh thương hiệu Thái (nước dừa) · tiêu chuẩn hữu cơ · logistics"},
+ {g:"fruit",n:"Chanh dây",hs:"0810.90 · 2009.89",growth:"high",gl:"Tăng trưởng cao",
+  form:"Tươi · puree/juice concentrate đông lạnh · frozen IQF",
+  seg:["Processing (juice EU)","Retail"],
+  season:"Quanh năm, đỉnh Tây Nguyên T6–T11",
+  rival:"Peru, Ecuador, Colombia, Brazil (Nam Mỹ thống trị)",
+  adv:"Tây Nguyên mở rộng nhanh · puree cạnh tranh · mới mở cửa tươi TQ (2024), Úc, Mỹ",
+  risk:"Chuẩn juice EU khắt khe · cạnh tranh Nam Mỹ về giá · giống chưa đồng đều"},
+ {g:"fruit",n:"Trái cây sấy",hs:"0813.40 · 2008.99",growth:"veryhigh",gl:"Tăng trưởng rất cao",
+  form:"Sấy dẻo (xoài/mít/chuối) · sấy giòn/chân không (VF) · sấy thăng hoa FD (sầu riêng/xoài) · dừa/chuối sấy",
+  seg:["Retail snack healthy","E-commerce","HORECA/bakery","Ingredient","Quà tặng"],
+  season:"Quanh năm — không phụ thuộc mùa vụ tươi; đầu ra cho trái vụ & trái xấu mã",
+  rival:"Thái Lan (thương hiệu & VF), Philippines (xoài sấy số 1), Trung Quốc",
+  adv:"Biên lợi nhuận cao gấp 3–8 lần bán tươi · ít rào cản kiểm dịch (không ruồi đục quả/chiếu xạ) · bảo quản lâu, logistics dễ · cưỡi xu hướng snack healthy",
+  risk:"Giới hạn đường bổ sung & SO2 (EU/US) · cần BRCGS/FSSC 22000 · thương hiệu yếu hơn Thái/Philippines"},
+ {g:"sea",n:"Tôm (thẻ/sú)",hs:"0306.17 · 1605.21/29",growth:"high",gl:"Tăng trưởng cao (value-added)",
+  form:"HLSO · PD/PUD · Nobashi · sushi ebi · tẩm bột · hấp chín",
+  seg:["Retail","HORECA","Processing","Food service"],
+  season:"Quanh năm (ĐBSCL), vụ chính T4–T9",
+  rival:"Ecuador (giá rẻ, sản lượng lớn), Ấn Độ, Indonesia, Thái Lan",
+  adv:"Chế biến sâu hàng đầu thế giới · đạt ASC/BAP · đa dạng sản phẩm ăn liền",
+  risk:"Thuế CBPG tại Mỹ · kháng sinh (Nhật/EU kiểm chặt) · cạnh tranh giá Ecuador/Ấn Độ"},
+ {g:"sea",n:"Cá tra (Pangasius)",hs:"0304.62 · 0304.32",growth:"mid",gl:"Trung bình – cao",
+  form:"Fillet đông lạnh · portion · tẩm bột · nguyên con · collagen/gelatin, dầu cá",
+  seg:["Retail (private label)","Food service","Processing"],
+  season:"Quanh năm (An Giang, Đồng Tháp)",
+  rival:"Gần như độc quyền; cạnh tranh gián tiếp cá thịt trắng (cod, pollock, tilapia)",
+  adv:"Gần như độc quyền nguồn cung · giá rất cạnh tranh · chuỗi khép kín · tận dụng phụ phẩm",
+  risk:"Truyền thông tiêu cực EU · thuế CBPG Mỹ (POR) · chuẩn ASC"},
+ {g:"sea",n:"Mực",hs:"0307.43 · 1605.54",growth:"mid",gl:"Tăng trưởng trung bình",
+  form:"Mực ống/nang làm sạch · sushi · nướng · ăn liền · mực khô",
+  seg:["HORECA","Retail","Processing"],
+  season:"Vụ chính T1–T4 & T7–T9 (khai thác biển)",
+  rival:"Trung Quốc, Ấn Độ, Indonesia, Peru",
+  adv:"Chế biến tinh · sản phẩm ăn liền · gần thị trường Nhật/Hàn",
+  risk:"Thẻ vàng IUU của EU (rủi ro lớn nhất) · nguồn lợi biến động · truy xuất nguồn gốc"},
+ {g:"sea",n:"Bạch tuộc",hs:"0307.52 · 1605.55",growth:"mid",gl:"Tăng trưởng trung bình",
+  form:"Nguyên con làm sạch · cắt · luộc · sushi/sashimi · ăn liền",
+  seg:["HORECA","Retail (Nhật/Hàn)","Processing"],
+  season:"Vụ chính T1–T4 & T7–T9",
+  rival:"Morocco, Mauritania (số 1), Ấn Độ, Indonesia, Trung Quốc",
+  adv:"Chất lượng chế biến · thị trường Hàn Quốc rất chuộng · gần Nhật/Hàn",
+  risk:"Thẻ vàng IUU EU · cạnh tranh Morocco/Mauritania · nguồn lợi hạn chế"},
+ {g:"sea",n:"Cá ngừ",hs:"1604.14 · 0304.87 · 0302/03",growth:"high",gl:"Tăng trưởng cao",
+  form:"Loin/steak đông lạnh · đóng hộp · sashimi tươi · pouch",
+  seg:["Retail (đồ hộp)","HORECA (sashimi)","Processing"],
+  season:"Quanh năm (khai thác đại dương)",
+  rival:"Thái Lan (đồ hộp số 1), Ecuador, Philippines, Indonesia, TBN",
+  adv:"Top XK cá ngừ · hưởng EVFTA (hạn ngạch đồ hộp) & CPTPP · chế biến đa dạng",
+  risk:"Thẻ vàng IUU · quy tắc xuất xứ nguyên liệu · phụ thuộc nguyên liệu nhập · thuế Mỹ"},
+];
+
+const ADV=[
+ {g:"fruit",n:"Sầu riêng",sub:"Ngôi sao dẫn dắt kim ngạch",d:[
+  ["Tự nhiên","Rải vụ quanh năm (Tây Nguyên, ĐBSCL, ĐNB); giống Ri6, Dona năng suất"],
+  ["Chi phí","Lao động & vận chuyển sang TQ thấp hơn Thái/Malaysia"],
+  ["Chứng nhận","Mã vùng trồng GACC; mở rộng GlobalGAP; truy xuất QR"],
+  ["Logistics","Đường bộ/sắt sang TQ ngắn nhất; giao 1,5–3 ngày"],
+  ["FTA","ACFTA & RCEP: 0% vào TQ; thông quan ưu tiên"],
+  ["Chế biến sâu","Cấp đông IQF nguyên trái/múi; paste; sấy thăng hoa (mở cửa TQ 2024)"],
+  ["__weak","Phụ thuộc ~90% TQ; kiểm soát Cd; chất lượng chưa đồng đều; cần chuẩn hóa vùng trồng"]]},
+ {g:"fruit",n:"Chuối",sub:"Thay thị phần Philippines",d:[
+  ["Tự nhiên","Vùng trồng thâm canh lớn (Đồng Nai, Tây Ninh, Lào Cai); Cavendish"],
+  ["Chi phí","Sản xuất thấp; gần TQ/Nhật/Hàn giảm cước lạnh"],
+  ["Chứng nhận","GlobalGAP; mã vùng trồng TQ; tăng chứng nhận Nhật/Hàn"],
+  ["Logistics","Cự ly ngắn sang Bắc Á; container lạnh 3–7 ngày"],
+  ["FTA","RCEP/ACFTA/VKFTA/VJEPA: thuế thấp/0% TQ, Hàn, Nhật"],
+  ["Chế biến sâu","Chuối sấy dẻo/giòn; bột chuối xanh"],
+  ["__weak","Dịch Panama TR4; đồng đều chất lượng; phụ thuộc TQ; cạnh tranh giá"]]},
+ {g:"fruit",n:"Xoài",sub:"Value-added puree dẫn dắt",d:[
+  ["Tự nhiên","Đa dạng giống đặc sản; xử lý ra hoa rải vụ"],
+  ["Chi phí","Nguyên liệu puree giá tốt; nhân công chế biến rẻ"],
+  ["Chứng nhận","Mã vùng trồng; nhà máy chiếu xạ/hơi nước đạt chuẩn Mỹ/Nhật/Hàn"],
+  ["Logistics","Gần Bắc Á; puree/đông lạnh vận chuyển linh hoạt"],
+  ["FTA","CPTPP/EVFTA/VJEPA/VKFTA ưu đãi nhiều thị trường"],
+  ["Chế biến sâu","Puree, IQF, sấy dẻo, nước ép — chuỗi value-added mạnh"],
+  ["__weak","Ruồi đục quả (chi phí xử lý); chất lượng tươi chưa đồng đều; thương hiệu yếu"]]},
+ {g:"fruit",n:"Thanh long",sub:"Cần đa dạng hóa khỏi TQ",d:[
+  ["Tự nhiên","Nước XK số 1 thế giới; chong đèn rải vụ"],
+  ["Chi phí","Sản xuất cạnh tranh (dù điện chong đèn tăng)"],
+  ["Chứng nhận","GlobalGAP, VietGAP; mã vùng trồng TQ"],
+  ["Logistics","Gần TQ; nhưng dễ hư hỏng cần lạnh nhanh"],
+  ["FTA","ACFTA/RCEP/EVFTA: 0% nhiều nơi"],
+  ["Chế biến sâu","Đông lạnh, nước ép, puree, sấy (còn sơ khai)"],
+  ["__weak","TQ tự trồng cạnh tranh trực tiếp → rớt giá; phụ thuộc TQ; chế biến sâu yếu"]]},
+ {g:"fruit",n:"Dừa",sub:"Bùng nổ value-added toàn cầu",d:[
+  ["Tự nhiên","Bến Tre/Trà Vinh vùng NL tập trung lớn; dừa xiêm ngọt"],
+  ["Chi phí","Chuỗi chế biến tích hợp; tận dụng toàn bộ trái"],
+  ["Chứng nhận","Hữu cơ EU/US; FSSC 22000; mã vùng trồng"],
+  ["Logistics","Cảng ĐBSCL & TP.HCM; sản phẩm chế biến bảo quản lâu"],
+  ["FTA","EVFTA/CPTPP/RCEP ưu đãi nước dừa & sản phẩm dừa"],
+  ["Chế biến sâu","Nước dừa lon, sữa dừa, cơm dừa sấy, dầu dừa, mỹ phẩm — rất mạnh"],
+  ["__weak","Cạnh tranh thương hiệu Thái; giá NL biến động; cần R&D & thương hiệu"]]},
+ {g:"fruit",n:"Chanh dây",sub:"Juice concentrate cho EU",d:[
+  ["Tự nhiên","Tây Nguyên mở rộng nhanh; giống tím/vàng"],
+  ["Chi phí","Puree/juice giá cạnh tranh so với Nam Mỹ"],
+  ["Chứng nhận","GlobalGAP; chuẩn juice EU; mã vùng trồng TQ (2024)"],
+  ["Logistics","Vận chuyển puree đông lạnh linh hoạt đi EU"],
+  ["FTA","EVFTA (0% juice), RCEP, ACFTA"],
+  ["Chế biến sâu","Juice concentrate, puree IQF cho ngành đồ uống EU"],
+  ["__weak","Chất lượng/giống chưa đồng đều; cạnh tranh Nam Mỹ; phụ thuộc thời tiết"]]},
+ {g:"sea",n:"Tôm",sub:"Vua chế biến sâu",d:[
+  ["Tự nhiên","ĐBSCL diện tích nuôi lớn; tôm sú sinh thái (rừng ngập mặn) khác biệt"],
+  ["Chi phí","Giá nuôi cao hơn Ecuador/Ấn Độ (bất lợi giá NL)"],
+  ["Chứng nhận","ASC, BAP, GlobalGAP; tôm sú hữu cơ; truy xuất chuỗi"],
+  ["Logistics","Nhiều nhà máy đạt chuẩn EU/Nhật; cảng gần vùng nuôi"],
+  ["FTA","CPTPP/EVFTA/UKVFTA/VKFTA ưu đãi lớn (EU, Nhật, Hàn, Canada)"],
+  ["Chế biến sâu","Value-added hàng đầu: Nobashi, sushi ebi, tẩm bột, hấp chín"],
+  ["__weak","Giá thành cao; thuế CBPG Mỹ; kháng sinh; dịch bệnh; phụ thuộc con giống nhập"]]},
+ {g:"sea",n:"Cá tra",sub:"Gần như độc quyền toàn cầu",d:[
+  ["Tự nhiên","Độc quyền toàn cầu; ĐBSCL điều kiện lý tưởng; chuỗi khép kín"],
+  ["Chi phí","Giá cực cạnh tranh so với cá thịt trắng khác (cod, pollock)"],
+  ["Chứng nhận","ASC; BAP; truy xuất; nhà máy chuẩn quốc tế"],
+  ["Logistics","Chuỗi lạnh khép kín; công suất chế biến lớn"],
+  ["FTA","EVFTA/UKVFTA/CPTPP/RCEP giảm thuế fillet"],
+  ["Chế biến sâu","Portion, tẩm bột, collagen, gelatin, dầu cá từ phụ phẩm"],
+  ["__weak","Hình ảnh tiêu cực EU; thuế CBPG Mỹ; phụ thuộc giá; đa dạng SP hạn chế"]]},
+ {g:"sea",n:"Mực & Bạch tuộc",sub:"Phụ thuộc gỡ thẻ vàng IUU",d:[
+  ["Tự nhiên","Ngư trường biển; gần Nhật/Hàn — thị trường tiêu thụ lớn"],
+  ["Chi phí","Nhân công chế biến rẻ; sản phẩm tinh giá tốt"],
+  ["Chứng nhận","Chuẩn Nhật/Hàn/EU; truy xuất khai thác"],
+  ["Logistics","Gần Bắc Á; chế biến ăn liền bảo quản tốt"],
+  ["FTA","VJEPA/VKFTA/RCEP ưu đãi Nhật, Hàn"],
+  ["Chế biến sâu","Sushi, ăn liền, nướng — chế biến tinh"],
+  ["__weak","THẺ VÀNG IUU của EU (rào cản lớn nhất); nguồn lợi suy giảm & biến động"]]},
+ {g:"sea",n:"Cá ngừ",sub:"Đòn bẩy EVFTA & CPTPP",d:[
+  ["Tự nhiên","Vùng biển miền Trung; đội tàu khai thác đại dương"],
+  ["Chi phí","Chế biến đồ hộp/loin cạnh tranh"],
+  ["Chứng nhận","Chuẩn đồ hộp EU/Mỹ; MSC (một phần); truy xuất"],
+  ["Logistics","Cảng miền Trung; đồ hộp bảo quản dài"],
+  ["FTA","EVFTA (hạn ngạch đồ hộp 11.500 tấn/năm), CPTPP, UKVFTA"],
+  ["Chế biến sâu","Đồ hộp, pouch, loin, sashimi — đa dạng"],
+  ["__weak","Thẻ vàng IUU; quy tắc xuất xứ nguyên liệu hạn chế tận dụng FTA; phụ thuộc NL nhập"]]},
+];
+
+const MARKETS=[
+ {n:"Trung Quốc",flag:"🇨🇳 Thị trường số 1",prio:"cao",
+  size:"Số 1 của cả trái cây & thủy sản VN; nhu cầu khổng lồ, tăng ~8–10%/năm; trung lưu bùng nổ.",
+  best:["Sầu riêng","Thanh long","Chuối","Dừa","Cá tra","Tôm"],
+  detail:[["Kênh phân phối","Đầu mối chợ Quảng Châu–Bằng Tường · siêu thị · E-commerce & livestream (Douyin/Pinduoduo)"],
+   ["Buyer & hành vi","Đầu mối lớn mua số lượng khủng; nhạy giá & mùa vụ; ưa mã vùng trồng rõ ràng; ép giá lúc rộ mùa"],
+   ["Thuế FTA","ACFTA & RCEP: hầu hết 0%. Cần Nghị định thư & mã GACC"],
+   ["__risk","Mã vùng trồng/đóng gói GACC; kiểm dịch chặt (Cd sầu riêng); phụ thuộc quá mức; biên mậu thay đổi"]],
+  s1:"Chuẩn hóa mã vùng trồng; ký thêm nghị định thư (dừa, chanh dây, đông lạnh); kho lạnh biên giới; livestream.",
+  s2:"Chuyển tiểu ngạch → chính ngạch; thương hiệu vùng trồng; đông lạnh & chế biến giảm rủi ro mùa vụ; đa dạng cửa khẩu."},
+ {n:"EU",flag:"🇪🇺 Đức·Hà Lan·Pháp·Bỉ·TBN",prio:"cao",
+  size:"Cao cấp ~450tr dân; chuộng bền vững & hữu cơ; tăng ổn định 3–5%; Hà Lan/Bỉ là cửa ngõ.",
+  best:["Tôm value-added","Cá ngừ đồ hộp","Cá tra","Chanh dây juice","Dừa","Xoài puree"],
+  detail:[["Kênh phân phối","Importer chuyên nghiệp · siêu thị (Lidl, Aldi, Carrefour) · phân phối qua Rotterdam/Antwerp"],
+   ["Buyer & hành vi","Khắt khe chứng nhận (ASC, GlobalGAP, hữu cơ); hợp đồng dài hạn; trả giá tốt cho chất lượng & CSR"],
+   ["Thuế FTA","EVFTA: lộ trình về 0% (nhiều dòng tôm đã 0%; cá tra giảm dần; cá ngừ theo hạn ngạch)"],
+   ["__risk","Thẻ vàng IUU (hải sản khai thác); MRL cực nghiêm; CBAM/EUDR & truy xuất; kiểm 100% một số lô"],
+   ["Hội chợ trọng điểm","Fruit Logistica (Berlin) · Anuga (Cologne) · SIAL Paris · Seafood Expo Global (Barcelona) · Biofach (hữu cơ)"]],
+  s1:"Tận dụng EVFTA giảm thuế; đạt ASC/hữu cơ; vào Hà Lan/Đức trước; dự án gỡ thẻ vàng IUU.",
+  s2:"Thương hiệu bền vững; tuân thủ EUDR/CBAM; tăng value-added & hữu cơ; hợp đồng chuỗi siêu thị dài hạn."},
+ {n:"Nhật Bản",flag:"🇯🇵 Cao cấp · ổn định",prio:"cao",
+  size:"~125tr dân; chi trả cao; chuộng chất lượng & an toàn; tôm/mực/bạch tuộc/cá ngừ lớn.",
+  best:["Tôm Nobashi/sushi ebi","Mực","Bạch tuộc","Cá ngừ sashimi","Chuối","Xoài"],
+  detail:[["Kênh phân phối","Sogo shosha (Sojitz, Marubeni) & importer · siêu thị (AEON) · chuỗi HORECA/sushi"],
+   ["Buyer & hành vi","Cực khắt khe chất lượng & đúng hẹn; quan hệ dài hạn, trung thành; kiểm kháng sinh; ưa OEM/private label"],
+   ["Thuế FTA","VJEPA/AJCEP & CPTPP: nhiều dòng tôm/cá 0% hoặc ưu đãi cao"],
+   ["__risk","Kiểm kháng sinh 100% một số lô tôm; MRL nghiêm; xử lý hơi nước nóng (xoài); tiêu chuẩn cảm quan cao"]],
+  s1:"Giữ chất lượng tôm chế biến; xử lý kiểm dịch trái cây; quan hệ sogo shosha; OEM cho retail.",
+  s2:"Nâng sản phẩm ăn liền cao cấp; co-branding; mở rộng trái cây tươi cao cấp (xoài, chuối, thanh long)."},
+ {n:"Hàn Quốc",flag:"🇰🇷 Tiêu thụ thủy sản cao",prio:"cao",
+  size:"~52tr dân, thủy sản/đầu người cao; chuộng bạch tuộc, mực, tôm; trái cây nhiệt đới tăng.",
+  best:["Bạch tuộc","Mực","Tôm","Chuối","Xoài","Thanh long","Dừa"],
+  detail:[["Kênh phân phối","Importer · đại siêu thị (E-mart, Lotte, Homeplus) · TMĐT (Coupang) · HORECA"],
+   ["Buyer & hành vi","Nhạy chất lượng & giá; ưa hàng chế biến tiện lợi; kiểm dịch chặt; mùa lễ tết tiêu thụ mạnh"],
+   ["Thuế FTA","VKFTA & RCEP: nhiều dòng ưu đãi mạnh (tôm hạn ngạch; nông sản giảm dần)"],
+   ["__risk","Kiểm dịch thực vật/kháng sinh chặt; hạn ngạch một số dòng; cạnh tranh hàng TQ"]],
+  s1:"Đẩy bạch tuộc/mực & tôm chế biến; tận dụng VKFTA; lên sàn Coupang; kiểm soát dư lượng.",
+  s2:"Sản phẩm tiện lợi (HMR) ăn liền; thương hiệu trái cây nhiệt đới; mở rộng bán lẻ hiện đại."},
+ {n:"Hoa Kỳ",flag:"🇺🇸 Lớn · chi trả cao",prio:"cao",
+  size:"Thị trường lớn & chi trả cao; nhu cầu tôm/cá tra/cá ngừ lớn; trái cây nhiệt đới tăng.",
+  best:["Tôm value-added","Cá tra fillet","Cá ngừ","Dừa/nước dừa","Xoài chiếu xạ","Thanh long"],
+  detail:[["Kênh phân phối","Importer/distributor lớn · siêu thị (Costco, Walmart, Whole Foods) · food service · cộng đồng gốc Á"],
+   ["Buyer & hành vi","Mua khối lượng lớn, hợp đồng chặt; yêu cầu FDA/FSMA, BAP; nhạy thuế CBPG; ưa private label & tiện lợi"],
+   ["Thuế FTA","Không có FTA song phương → thuế MFN + rủi ro thuế CBPG (tôm, cá tra) & thuế đối ứng"],
+   ["__risk","Thuế chống bán phá giá (POR tôm & cá tra); FDA/FSMA; chiếu xạ trái cây; logistics xa; rủi ro chính sách thuế"],
+   ["Hội chợ trọng điểm","Seafood Expo North America (Boston) · Sweets & Snacks Expo (Chicago) · PLMA Private Label · Natural Products Expo West · Winter Fancy Food"]],
+  s1:"Giữ thị phần tôm/cá tra chế biến; đẩy dừa & nước dừa (xu hướng healthy); tối ưu thuế CBPG; kho tại Mỹ.",
+  s2:"Đa dạng SP value-added né CBPG; thương hiệu nước dừa/trái cây; mở rộng trái cây chiếu xạ; phân phối tại chỗ."},
+ {n:"Ấn Độ",flag:"🇮🇳 Mới nổi · 1,4 tỷ dân",prio:"tb",
+  size:"1,4 tỷ dân; trung lưu tăng nhanh; nhu cầu sầu riêng/thanh long/nông sản nhiệt đới mới nổi.",
+  best:["Sầu riêng (mới)","Thanh long","Chanh dây","Cá tra (tiềm năng)"],
+  detail:[["Kênh phân phối","Importer/wholesaler · chợ đầu mối · bán lẻ hiện đại & TMĐT đang lên (BigBasket)"],
+   ["Buyer & hành vi","Rất nhạy giá; ưa số lượng lớn giá thấp; thương lượng nhiều; thanh toán cần thận trọng"],
+   ["Thuế FTA","AIFTA (ASEAN–Ấn Độ) & APTA: một số dòng ưu đãi, nhưng bảo hộ nông sản khá cao"],
+   ["__risk","Hàng rào thuế & phi thuế cao; thủ tục phức tạp; cạnh tranh nội địa; rủi ro thanh toán; hạ tầng lạnh yếu"]],
+  s1:"Thử nghiệm thanh long/sầu riêng qua importer uy tín; giá cạnh tranh; xây quan hệ; kiểm soát rủi ro thanh toán.",
+  s2:"Mở rộng khi trung lưu tăng; đàm phán giảm rào cản; thay thế nguồn khác; đầu tư logistics."},
+ {n:"CPTPP khác",flag:"🇦🇺🇨🇦🇸🇬🇳🇿 Úc·Canada·Singapore·NZ",prio:"tb",
+  size:"Cao cấp, chi trả tốt; Úc/Canada dân gốc Á đông; Singapore là hub tái xuất & HORECA cao cấp.",
+  best:["Tôm","Cá tra","Cá ngừ","Xoài","Thanh long","Nhãn/vải","Dừa"],
+  detail:[["Kênh phân phối","Importer chuyên · siêu thị (Woolworths, Loblaws, FairPrice) · HORECA · cộng đồng gốc Á"],
+   ["Buyer & hành vi","Khắt khe kiểm dịch (Úc rất nghiêm); chuộng chứng nhận & bền vững; hợp đồng ổn định; giá tốt"],
+   ["Thuế FTA","CPTPP: lộ trình 0% nhiều dòng; ưu đãi lớn cho tôm/cá & trái cây đã mở cửa"],
+   ["__risk","Kiểm dịch sinh vật hại rất nghiêm (Úc/NZ); chiếu xạ trái cây; khoảng cách xa (Canada); đơn lẻ nhỏ"]],
+  s1:"Tận dụng CPTPP; hoàn tất mở cửa kiểm dịch trái cây; Singapore làm hub; nhắm cộng đồng gốc Á.",
+  s2:"Value-added & hữu cơ cao cấp; thương hiệu; mở rộng trái cây tươi (Úc, Canada); HORECA cao cấp."},
+ {n:"Trung Đông",flag:"🇦🇪🇸🇦 UAE · Saudi Arabia",prio:"tb",
+  size:"Hub tái xuất (Dubai); thu nhập cao; nhập gần như toàn bộ thực phẩm; Halal bắt buộc; tăng nhanh.",
+  best:["Tôm","Cá tra","Cá ngừ","Sầu riêng","Xoài","Thanh long","Dừa"],
+  detail:[["Kênh phân phối","Importer/distributor & re-exporter (Dubai) · đại siêu thị (Carrefour, Lulu) · HORECA khách sạn cao cấp"],
+   ["Buyer & hành vi","Ưa nguồn cung ổn định & Halal; nhạy giá vừa phải; Dubai tái xuất đi châu Phi/CIS; thanh toán tương đối tốt"],
+   ["Thuế FTA","Chưa có FTA (đang đàm phán CEPA VN–UAE); thuế nhập thấp (~0–5%) & thống nhất GCC"],
+   ["__risk","Chứng nhận Halal bắt buộc; tiêu chuẩn ESMA/SFDA; cạnh tranh nguồn cung toàn cầu; logistics xa"]],
+  s1:"Đạt chứng nhận Halal; qua distributor Dubai; đẩy cá tra & tôm; hiện diện hội chợ Gulfood.",
+  s2:"Dùng Dubai làm hub đi châu Phi; ký CEPA VN–UAE; thương hiệu trái cây cao cấp; sầu riêng cao cấp."},
+];
+
+const MATRIX=[
+ {n:"Sầu riêng × Trung Quốc",x:5,y:5,grp:"attack",a:"Chuẩn hóa GACC, mở rộng đông lạnh, khóa đầu mối lớn, kiểm soát Cd"},
+ {n:"Tôm value-added × Nhật Bản",x:5,y:5,grp:"attack",a:"Giữ chất lượng Nobashi/sushi ebi, OEM cho retail, quan hệ sogo shosha"},
+ {n:"Cá tra × Trung Quốc",x:5,y:5,grp:"attack",a:"Phục hồi thị phần, chính ngạch, portion value-added, giá cạnh tranh"},
+ {n:"Tôm value-added × EU",x:5,y:4,grp:"attack",a:"Tận dụng EVFTA về 0%, đạt ASC/hữu cơ, vào Đức/Hà Lan"},
+ {n:"Dừa & nước dừa × Hoa Kỳ",x:5,y:4,grp:"attack",a:"Cưỡi xu hướng healthy, thương hiệu nước dừa, kho tại Mỹ"},
+ {n:"Bạch tuộc/Mực × Hàn Quốc",x:4,y:4,grp:"attack",a:"Sản phẩm chế biến tiện lợi, tận dụng VKFTA, lên Coupang"},
+ {n:"Cá ngừ đồ hộp × EU",x:4,y:4,grp:"attack",a:"Khai thác hạn ngạch EVFTA, chủ động nguyên liệu, gỡ thẻ vàng IUU"},
+ {n:"Chuối × TQ/Nhật/Hàn",x:4,y:4,grp:"attack",a:"Thay thị phần Philippines, kiểm soát dịch Panama, tăng chuối sấy"},
+ {n:"Xoài (puree/tươi) × Nhật/Hàn/EU",x:4,y:4,grp:"attack",a:"Xử lý kiểm dịch, đẩy puree cho đồ uống, tươi cao cấp"},
+ {n:"Chanh dây juice × EU",x:4,y:4,grp:"attack",a:"Tận dụng EVFTA 0%, nâng concentrate cạnh tranh Nam Mỹ"},
+ {n:"Tôm × Hoa Kỳ",x:5,y:3,grp:"keep",a:"Đối phó CBPG bằng value-added; giữ khách lớn; kho tại chỗ"},
+ {n:"Cá tra × Hoa Kỳ",x:4,y:4,grp:"keep",a:"Giữ thị phần dưới áp lực thuế CBPG; đa dạng SP né thuế"},
+ {n:"Thanh long × Trung Quốc",x:3,y:3,grp:"keep",a:"Bão hòa do TQ tự trồng; chuyển sang đông lạnh/chế biến"},
+ {n:"Tôm/Cá tra × Trung Đông",x:4,y:4,grp:"invest",a:"Đạt Halal, qua hub Dubai, ký CEPA VN–UAE, hội chợ Gulfood"},
+ {n:"Sầu riêng × Ấn Độ",x:4,y:3,grp:"invest",a:"Thử qua importer uy tín, xây quan hệ, kiểm soát rủi ro thanh toán"},
+ {n:"Trái cây tươi × CPTPP (Úc/Canada)",x:4,y:3,grp:"invest",a:"Hoàn tất mở cửa kiểm dịch, tận dụng CPTPP, nhắm cộng đồng gốc Á"},
+ {n:"Sầu riêng/Dừa × Trung Đông",x:4,y:3,grp:"invest",a:"SP cao cấp cho khách sạn; Halal; distributor Dubai"},
+ {n:"Thanh long × Ấn Độ/EU/Trung Đông",x:3,y:3,grp:"invest",a:"Đa dạng hóa khỏi TQ; chế biến sâu; thị trường mới"},
+ {n:"Mực/Bạch tuộc × EU",x:3,y:2,grp:"limit",a:"Bị thẻ vàng IUU cản trở; chờ gỡ thẻ mới đẩy mạnh"},
+ {n:"Thanh long tươi × Nhật/Hàn (đại trà)",x:2,y:2,grp:"limit",a:"Quy mô nhỏ, kiểm dịch tốn kém; chỉ làm phân khúc quà cao cấp"},
+];
+const GRPMETA={attack:{t:"Tấn công",c:"var(--green)"},keep:{t:"Duy trì",c:"#2E86C1"},invest:{t:"Đầu tư dài hạn",c:"var(--warn)"},limit:{t:"Hạn chế",c:"var(--crit)"}};
+
+const ROADMAP=[
+ {p:1,yr:"2026–2027",name:"Tấn công nhanh",theme:"Chiếm thị phần bằng lợi thế sẵn có & FTA",
+  fr:["Chuẩn hóa mã vùng trồng (GACC/GlobalGAP)","Bùng nổ sầu riêng đông lạnh vào TQ","Đẩy dừa & nước dừa vào Mỹ/TQ","Chuối thay thị phần Philippines","Xử lý kiểm dịch xoài/chanh dây mở cửa mới"],
+  se:["Giữ & tăng tôm value-added ở Nhật/EU/Hàn","Phục hồi cá tra tại TQ & Mỹ","Dự án gỡ thẻ vàng IUU (mực/bạch tuộc/cá ngừ)","Khai thác hạn ngạch cá ngừ EVFTA","Kiểm soát kháng sinh & truy xuất"],
+  m:"Trung Quốc · Nhật · Hàn · EU · Mỹ",
+  kpi:"Tăng trưởng kim ngạch 2 nhóm 10–15%/năm · Sầu riêng vượt 3,5–4 tỷ USD · Giảm tỷ trọng tiểu ngạch TQ <20%"},
+ {p:2,yr:"2028–2029",name:"Mở rộng & nâng cấp giá trị",theme:"Đa dạng thị trường & tăng chế biến sâu",
+  fr:["Tăng tỷ trọng đông lạnh/puree/sấy (value-added)","Mở rộng Ấn Độ, Trung Đông, CPTPP","Thương hiệu vùng trồng & chỉ dẫn địa lý","Giảm phụ thuộc TQ cho thanh long"],
+  se:["Nâng tỷ trọng sản phẩm ăn liền/HMR","Chủ động nguyên liệu cá ngừ (đội tàu/nhập hợp chuẩn)","Mở Trung Đông (Halal) & Nam Mỹ cho cá tra","Đạt ASC/BAP diện rộng; tuân thủ EUDR/CBAM"],
+  m:"Trung Đông · CPTPP (Úc/Canada) · Ấn Độ · EU (nâng cấp)",
+  kpi:"Tỷ trọng value-added >40% · Top 3 thị trường chiếm <60% · Ký CEPA VN–UAE; gỡ thẻ vàng IUU"},
+ {p:3,yr:"2030",name:"Định vị thương hiệu cao cấp",theme:"Thương hiệu quốc gia & bền vững",
+  fr:["Thương hiệu trái cây Việt cao cấp toàn cầu","Chuỗi hữu cơ & truy xuất blockchain","SP giá trị cao (sầu riêng thăng hoa, nước dừa premium)"],
+  se:["Thương hiệu tôm/cá tra bền vững (ASC/hữu cơ)","Dẫn đầu chế biến sâu & sản phẩm chức năng (collagen, protein)","Trung hòa carbon chuỗi cung ứng"],
+  m:"Toàn cầu — phân khúc cao cấp",
+  kpi:"Kim ngạch 2 nhóm mục tiêu tăng ~1,5–2 lần so với 2025 · Thương hiệu quốc gia được nhận diện · Phát triển bền vững, carbon thấp"},
+];
+
+/* ================= RENDER ================= */
+const $=(s,e=document)=>e.querySelector(s);
+const $$=(s,e=document)=>[...e.querySelectorAll(s)];
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+
+// A. Product mapping
+function renderPM(grp){
+  const el=$("#pmGrid");
+  el.innerHTML=PRODUCTS.filter(p=>p.g===grp).map(p=>`
+   <article class="pcard ${p.g}">
+     <div class="pcard-top">
+       <h3>${p.n}<span class="hs">${p.hs}</span></h3>
+       <span class="growth g-${p.growth}">${p.gl}</span>
+     </div>
+     <div class="pcard-body">
+       <div class="frow"><span class="k">Dạng SP</span><span class="v">${p.form}</span></div>
+       <div class="frow"><span class="k">Phân khúc</span><span class="v"><div class="tagrow">${p.seg.map(s=>`<span class="tg">${s}</span>`).join('')}</div></span></div>
+       <div class="frow"><span class="k">Mùa vụ</span><span class="v">${p.season}</span></div>
+       <div class="frow"><span class="k">Đối thủ</span><span class="v">${p.rival}</span></div>
+       <div class="frow"><span class="k">Lợi thế VN</span><span class="v adv">${p.adv}</span></div>
+       <div class="frow"><span class="k">Rào cản</span><span class="v risk">${p.risk}</span></div>
+     </div>
+   </article>`).join('');
+}
+$$(".tab").forEach(t=>t.addEventListener('click',()=>{
+  $$(".tab").forEach(x=>x.setAttribute('aria-selected','false'));
+  t.setAttribute('aria-selected','true');renderPM(t.dataset.grp);
+}));
+renderPM('fruit');
+
+// B. Advantages
+$("#advList").innerHTML=ADV.map((a,i)=>`
+ <div class="acc ${a.g}" open-state="${i===0?1:0}">
+   <button class="acc-h">
+     <span class="acc-badge"></span>
+     <span><span class="nm">${a.n}</span> <span class="sub">— ${a.sub}</span></span>
+     <span class="chev">▼</span>
+   </button>
+   <div class="acc-panel"><div class="dim-grid">
+     ${a.d.map(([h,t])=>{const w=h==="__weak";return `<div class="dim${w?' weak':''}"><div class="dh">${w?'⚠ Điểm yếu':esc(h)}</div><div class="dt">${t}</div></div>`}).join('')}
+   </div></div>
+ </div>`).join('');
+$$("#advList .acc-h").forEach(b=>b.addEventListener('click',()=>{
+  const acc=b.parentElement;acc.setAttribute('open-state',acc.getAttribute('open-state')==="1"?"0":"1");
+}));
+
+// C. Markets
+function renderMkt(f='all'){
+  $("#mktGrid").innerHTML=MARKETS.map((m,i)=>`
+   <article class="mcard${f!=='all'&&m.prio!==f?' hide':''}" data-prio="${m.prio}" open-state="0">
+     <div class="mcard-h">
+       <div class="mtop">
+         <div><h3>${m.n}</h3><div class="flag">${m.flag}</div></div>
+         <span class="prio ${m.prio}">${m.prio==='cao'?'Ưu tiên Cao':'Trung bình'}</span>
+       </div>
+       <div class="msize">${m.size}</div>
+       <div class="mbest">${m.best.map(b=>`<span class="tg">${b}</span>`).join('')}</div>
+       <div class="expand-hint">＋ Nhấn để xem kênh · buyer · thuế · chiến lược</div>
+     </div>
+     <div class="mcard-detail">
+       ${m.detail.map(([k,v])=>{const r=k==='__risk';return `<div class="drow"><span class="k">${r?'Rào cản & rủi ro':esc(k)}</span><span class="v${r?' risk':''}">${v}</span></div>`}).join('')}
+       <div class="strat">
+         <div class="sbox s1"><div class="sh">Ngắn hạn 2026–2027</div><div class="st">${m.s1}</div></div>
+         <div class="sbox s2"><div class="sh">Trung hạn 2028–2030</div><div class="st">${m.s2}</div></div>
+       </div>
+     </div>
+   </article>`).join('');
+  $$("#mktGrid .mcard-h").forEach(h=>h.addEventListener('click',()=>{
+    const c=h.parentElement;c.setAttribute('open-state',c.getAttribute('open-state')==="1"?"0":"1");
+  }));
+}
+$$(".chip").forEach(c=>c.addEventListener('click',()=>{
+  $$(".chip").forEach(x=>x.setAttribute('aria-pressed','false'));
+  c.setAttribute('aria-pressed','true');renderMkt(c.dataset.f);
+}));
+renderMkt();
+
+// D. Matrix plot + list
+const plot=$("#plot"),tip=$("#tip");
+MATRIX.forEach((d)=>{
+  const dot=document.createElement('div');
+  dot.className=`dot-pt ${d.grp}`;
+  // jitter for overlapping identical coords
+  const jx=(Math.random()-.5)*3.5,jy=(Math.random()-.5)*3.5;
+  dot.style.left=`calc(${((d.x-1)/4)*84+8}% + ${jx}px)`;
+  dot.style.bottom=`calc(${((d.y-1)/4)*84+8}% + ${jy}px)`;
+  dot.addEventListener('mouseenter',e=>{
+    tip.innerHTML=`<span class="tg2">${GRPMETA[d.grp].t}</span>${d.n}`;
+    tip.style.opacity=1;dot.classList.add('on');
+  });
+  dot.addEventListener('mousemove',e=>{tip.style.left=(e.clientX+14)+'px';tip.style.top=(e.clientY-10)+'px';});
+  dot.addEventListener('mouseleave',()=>{tip.style.opacity=0;dot.classList.remove('on');});
+  plot.appendChild(dot);
+});
+const order=['attack','keep','invest','limit'];
+$("#grpList").innerHTML=order.map(g=>{
+  const items=MATRIX.filter(m=>m.grp===g).sort((a,b)=>b.x*b.y-a.x*a.y);
+  return `<div class="grp">
+    <div class="grp-h"><span class="gi" style="background:${GRPMETA[g].c}"></span>
+      <span class="gt">${GRPMETA[g].t}</span><span class="gc">${items.length} cặp</span></div>
+    ${items.map(m=>`<div class="mrow"><span class="sc">${m.x*m.y}</span><span><span class="mn">${m.n}</span> — <span class="ma">${m.a}</span></span></div>`).join('')}
+  </div>`;
+}).join('');
+
+// E. Roadmap
+$("#timeline").innerHTML=ROADMAP.map(r=>`
+ <div class="phase p${r.p}">
+   <div class="phase-dot">${r.p}</div>
+   <div class="phase-card">
+     <div class="phase-top"><span class="phase-yr">${r.yr}</span><span class="phase-theme">${r.name} — ${r.theme}</span></div>
+     <div class="phase-body">
+       <div class="pcol fr"><div class="ch">🍈 Trái cây</div><ul>${r.fr.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+       <div class="pcol se"><div class="ch">🦐 Thủy sản</div><ul>${r.se.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+     </div>
+     <div class="kpi"><span class="kl">Thị trường</span><span class="kt">${r.m}</span></div>
+     <div class="kpi"><span class="kl">KPI 🎯</span><span class="kt">${r.kpi}</span></div>
+   </div>
+ </div>`).join('');
+
+// ---- Kim ngạch charts ----
+const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const FRUIT_KN=[["Sầu riêng",3.60],["Dừa (chế biến)",1.00],["Thanh long",0.50],["Chuối",0.34],["Xoài",0.28],["Chanh dây",0.23],["Trái cây sấy",0.30]];
+const SEA_KN=[["Tôm",4.30],["Cá tra",2.10],["Cá ngừ",1.05],["Mực & bạch tuộc",0.70],["Cua ghẹ & khác",0.45]];
+const TARGET=[["Trái cây/rau quả 2025",8.0,"fr"],["Trái cây/rau quả 2030",14.0,"fr"],["Thủy sản 2025",10.5,"se"],["Thủy sản 2030",15.0,"se"]];
+const FRUIT_MKT=[["Trung Quốc",65],["Hoa Kỳ",5],["Hàn Quốc",5],["Thái Lan",4],["Nhật Bản",3],["Hà Lan/EU",3],["Khác",15]];
+const SEA_MKT=[["Hoa Kỳ",18],["Trung Quốc & HK",17],["Nhật Bản",15],["EU-27",11],["Hàn Quốc",8],["Khác",31]];
+const DRIED=[["2025",300],["2026",360],["2027",430],["2028",520],["2029",620],["2030",740]];
+
+function renderBars(id,data,cls){
+  const max=Math.max(...data.map(d=>d[1]));
+  $("#"+id).innerHTML=data.map(d=>{
+    const cc=d[2]||cls;
+    return `<div class="bar-row"><span class="bl">${d[0]}</span>
+      <div class="bar-track"><div class="bar-fill ${cc}" style="width:0" data-w="${(d[1]/max*100).toFixed(1)}">${d[1].toFixed(2).replace('.',',')}</div></div></div>`;
+  }).join('');
+}
+renderBars("barsFruit",FRUIT_KN,"fr");
+renderBars("barsSea",SEA_KN,"se");
+renderBars("barsTarget",TARGET.map(t=>[t[0],t[1],t[2]]),"fr");
+
+function renderTraj(){
+  const max=Math.max(...DRIED.map(d=>d[1]));
+  $("#trajDried").innerHTML=DRIED.map(d=>
+    `<div class="tcol"><span class="tv">${d[1]}</span><div class="tbar" style="height:0" data-h="${(d[1]/max*100).toFixed(1)}"></div><span class="ty">${d[0]}</span></div>`).join('');
+}
+renderTraj();
+
+const DONUT_COLORS=["#123A4B","#B9862F","#2C7A4B","#0C7573","#2E86C1","#C6862A","#9AA5B1"];
+function drawDonut(canvasId,legId,data){
+  const cv=document.getElementById(canvasId);const ctx=cv.getContext('2d');
+  const dpr=Math.min(devicePixelRatio||1,2);cv.width=120*dpr;cv.height=120*dpr;ctx.scale(dpr,dpr);
+  const total=data.reduce((s,d)=>s+d[1],0);let a=-Math.PI/2;const cx=60,cy=60,rO=52,rI=31;
+  data.forEach((d,i)=>{
+    const ang=d[1]/total*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,rO,a,a+ang);ctx.closePath();
+    ctx.fillStyle=DONUT_COLORS[i%DONUT_COLORS.length];ctx.fill();a+=ang;
+  });
+  ctx.globalCompositeOperation='destination-out';ctx.beginPath();ctx.arc(cx,cy,rI,0,Math.PI*2);ctx.fill();
+  ctx.globalCompositeOperation='source-over';
+  $("#"+legId).innerHTML=data.map((d,i)=>
+    `<div class="li"><span class="sw" style="background:${DONUT_COLORS[i%DONUT_COLORS.length]}"></span>${d[0]}<span class="lv">${d[1]}%</span></div>`).join('');
+}
+drawDonut("donutFruit","legFruit",FRUIT_MKT);
+drawDonut("donutSea","legSea",SEA_MKT);
+
+// animate bars/traj on scroll into view
+const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){
+  $$(".bar-fill",e.target).forEach(b=>b.style.width=b.dataset.w+"%");
+  $$(".tbar",e.target).forEach(b=>b.style.height=b.dataset.h+"%");
+  io.unobserve(e.target);
+}})},{threshold:.25});
+$$("#kimngach .chart-card").forEach(c=>io.observe(c));
+
+// ---- Buyer & Giá FOB ----
+const BUYER_EU=[
+ ["Importer / Trader chuyên","Catz International (Rotterdam) · Community Foods (UK) · Voicevale"],
+ ["Nguyên liệu hữu cơ","Tradin Organic · Alnatura/dennree · Rapunzel (DE)"],
+ ["Brand / OEM snack","Seeberger (DE) · Besana (IT) · Farmer's Snack (DE)"],
+ ["Bán lẻ (private label)","Lidl · Aldi · REWE · Albert Heijn · Carrefour · Tesco"],
+ ["Health-food / E-commerce","Holland &amp; Barrett · Naturalia · Amazon EU"],
+];
+const BUYER_US=[
+ ["Importer / Distributor","Sunrise Commodities · Sunridge Farms · SunOpta"],
+ ["Brand freeze-dried / snack","Crispy Green · Made in Nature · Bare (PepsiCo) · Sensible Foods"],
+ ["Tropical snack","Barnana · Solely · Nature's Garden"],
+ ["Ethnic-Asian distributor","JFC International · Wismettac · Nishimoto"],
+ ["Bán lẻ (private label)","Costco · Trader Joe's · Whole Foods 365 · Sprouts · Walmart · Amazon"],
+];
+const chHTML=arr=>arr.map(c=>`<div class="byr-ch"><div class="ct">${c[0]}</div><div class="cc">${c[1]}</div></div>`).join('');
+$("#byrEU").innerHTML=chHTML(BUYER_EU);
+$("#byrUS").innerHTML=chHTML(BUYER_US);
+
+const FOB=[["Chuối sấy",1.8,3.0],["Xoài sấy dẻo",4.5,7.0],["Thanh long sấy",6,10],["Dừa chips",3.5,6],
+ ["Mít VF",8,14],["Mix rau củ VF",7,12],["FD xoài",18,30],["FD sầu riêng",28,45],["FD mix/dâu",20,35]];
+const FOBMAX=45;
+$("#fobBars").innerHTML=FOB.map(f=>{
+  const l=(f[1]/FOBMAX*100).toFixed(1),w=((f[2]-f[1])/FOBMAX*100).toFixed(1);
+  const fmt=n=>n.toFixed(n<10?1:0).replace('.',',');
+  return `<div class="rbar-row"><span class="rl">${f[0]}</span>
+    <div class="rbar-track"><div class="rbar-seg" style="left:${l}%;width:${w}%"></div></div>
+    <span class="rv">${fmt(f[1])}–${fmt(f[2])}</span></div>`;
+}).join('');
+
+const COST=[["Nguyên liệu tươi",40],["Bao bì",11],["Năng lượng sấy",12],["Nhân công",10],
+ ["Đường/phụ gia",7],["Hao hụt & khấu hao",6],["Lợi nhuận",6],["Logistics & phí XK",5],["Chứng nhận/QA",3]];
+drawDonut("donutCost","legCost",COST);
+
+// ---- Checklist ----
+const CK=[
+ {id:"a",cls:"a",t:"A · Nền tảng nhà máy & sản phẩm",items:[
+  ["req","Đăng ký kinh doanh, mã số thuế XNK; đăng ký DN xuất khẩu với hải quan","Hải quan / Sở KHĐT"],
+  ["req","HACCP vận hành + chứng nhận GFSI (BRCGS Food / FSSC 22000 / IFS)","GFSI — audit nhà máy hằng năm"],
+  ["req","Hợp đồng & truy xuất vùng nguyên liệu (mã vùng trồng, nhật ký canh tác)","Nền tảng cho EUDR & FSVP"],
+  ["req","Kiểm nghiệm: vi sinh, aflatoxin, kim loại nặng, dư lượng BVTV, SO2, đường, độ ẩm/aw","Lab ISO 17025 — COA mỗi lô"],
+  ["req","Nhãn mác: thành phần, dinh dưỡng, phụ gia (E-number), dị ứng, lô, HSD, xuất xứ","Duyệt nhãn trước khi in"],
+  ["req","Bao bì food-grade chống ẩm + Declaration of Compliance vật liệu tiếp xúc","EU 10/2011 · FDA 21 CFR 174–190"],
+  ["opt","Test shelf-life / độ ổn định sản phẩm","Hỗ trợ công bố HSD"],
+ ]},
+ {id:"b",cls:"b",t:"B · Riêng thị trường EU (EU-27 + UK)",items:[
+  ["req","Chứng nhận GFSI (ưu tiên BRCGS Food / IFS Food) — audit nhà máy","Chuỗi bán lẻ EU yêu cầu"],
+  ["req","Tuân thủ phụ gia & giới hạn SO2/sulfite (E220)","Reg (EC) 1333/2008"],
+  ["req","Giới hạn MRL & chất nhiễm bẩn (aflatoxin, kim loại nặng)","Reg 396/2005 & Reg 2023/915"],
+  ["cond","EUDR — không phá rừng: due diligence + tọa độ GPS vùng trồng + truy xuất","Reg (EU) 2023/1115 — xác minh phạm vi áp dụng"],
+  ["req","Ghi nhãn FIC: dị ứng in đậm, bảng dinh dưỡng, QUID","Reg (EU) 1169/2011"],
+  ["cond","Nếu hữu cơ: EU Organic + COI qua hệ thống TRACES","Reg (EU) 2018/848"],
+  ["req","Xác định Importer of Record EU chịu trách nhiệm tuân thủ","Phối hợp hồ sơ"],
+ ]},
+ {id:"c",cls:"c",t:"C · Riêng thị trường Hoa Kỳ",items:[
+  ["req","FDA Food Facility Registration + US Agent (gia hạn 2 năm/lần)","FDA — có số đăng ký cơ sở"],
+  ["req","FSVP — cung cấp HACCP/COA/audit cho nhà nhập khẩu Mỹ","FDA FSMA"],
+  ["req","Preventive Controls + có PCQI","FDA 21 CFR 117"],
+  ["req","Prior Notice cho từng lô trước khi hàng đến cảng","FDA — nộp qua hệ thống"],
+  ["req","Ghi nhãn FDA: Nutrition Facts, thành phần, dị ứng (Big 9), COOL","21 CFR 101 · 'contains sulfites' nếu SO2 ≥10ppm"],
+  ["req","Giới hạn aflatoxin & dư lượng BVTV theo dung sai FDA/EPA","Tránh Import Alert"],
+  ["cond","Nếu hữu cơ: chứng nhận USDA Organic (NOP)","Qua tổ chức được công nhận"],
+ ]},
+ {id:"d",cls:"d",t:"D · Chứng từ lô hàng (mỗi lô xuất)",items:[
+  ["req","Commercial Invoice + Packing List","Khớp thông tin lô"],
+  ["req","Bill of Lading / Airway Bill","Hãng tàu / hàng không"],
+  ["req","C/O mẫu EUR.1 (EVFTA/UKVFTA) để hưởng ưu đãi thuế","VCCI / Bộ Công Thương"],
+  ["req","Certificate of Analysis (COA) mỗi lô","Vi sinh, hóa lý, SO2, kim loại nặng"],
+  ["cond","Health / Free Sale Certificate (nếu buyer/nước yêu cầu)","Cơ quan thẩm quyền"],
+  ["cond","Phytosanitary Certificate (nếu loại SP/nước yêu cầu)","Sấy chế biến thường không cần"],
+  ["cond","Chứng nhận Halal (nếu đồng thời đi Trung Đông)","Tổ chức Halal"],
+  ["cond","ISPM 15 cho pallet gỗ + Fumigation Cert","Đóng dấu IPPC trên pallet"],
+ ]},
+];
+const LVL={req:["Bắt buộc","lv-req"],cond:["Điều kiện","lv-cond"],opt:["Nên có","lv-opt"]};
+const CKKEY="tcx_checklist_v1";
+let ckState={};
+try{ckState=JSON.parse(localStorage.getItem(CKKEY)||"{}")||{}}catch(e){ckState={}}
+let ckTotal=0;
+$("#ckGrid").innerHTML=CK.map(g=>{
+  const its=g.items.map((it,i)=>{
+    const id=g.id+"-"+i; ckTotal++;
+    const done=ckState[id]?" done":"";
+    const [lt,lc]=LVL[it[0]];
+    return `<div class="ck-item${done}" data-id="${id}"><div class="ck-box">✓</div>
+      <div class="ck-txt">${it[1]}<span class="lv ${lc}">${lt}</span><span class="rf">${it[2]}</span></div></div>`;
+  }).join('');
+  return `<div class="ck-card"><div class="ck-head ${g.cls}"><span class="ci"></span><h3>${g.t}</h3></div>
+    <div class="ck-list">${its}</div></div>`;
+}).join('');
+function ckUpdate(){
+  const done=Object.values(ckState).filter(Boolean).length;
+  const pct=ckTotal?Math.round(done/ckTotal*100):0;
+  $("#ckFill").style.width=pct+"%"; $("#ckPct").textContent=pct+"%"; $("#ckCount").textContent=done+"/"+ckTotal;
+}
+$$("#ckGrid .ck-item").forEach(el=>el.addEventListener('click',()=>{
+  const id=el.dataset.id; ckState[id]=!ckState[id];
+  el.classList.toggle('done',ckState[id]);
+  try{localStorage.setItem(CKKEY,JSON.stringify(ckState))}catch(e){}
+  ckUpdate();
+}));
+$("#ckReset").addEventListener('click',()=>{
+  ckState={}; try{localStorage.removeItem(CKKEY)}catch(e){}
+  $$("#ckGrid .ck-item").forEach(el=>el.classList.remove('done')); ckUpdate();
+});
+ckUpdate();
+
+// ---- Quy trình thực thi ----
+const QT=[
+ {p:0,t:"Giai đoạn 0 · Chuẩn bị nền tảng",time:"3–9 tháng",steps:[
+  ["Chọn sản phẩm & thị trường mục tiêu","Danh mục SP × thị trường ưu tiên","Ma trận ưu tiên","#matran"],
+  ["Chuẩn hóa vùng nguyên liệu & năng lực SX","Mã vùng trồng, công suất, chất lượng ổn định","Lợi thế nhóm hàng","#loithe"],
+  ["Đạt chứng nhận nền tảng","HACCP → BRCGS/FSSC 22000 (ASC/BAP)","Checklist mục A–C","#checklist"],
+  ["Hoàn thiện mẫu, bao bì, nhãn, hồ sơ kỹ thuật","Sản phẩm mẫu + spec sheet + nhãn duyệt","Checklist mục A","#checklist"],
+ ]},
+ {p:1,t:"Giai đoạn 1 · Tìm & chốt khách (Sales)",time:"1–4 tháng",steps:[
+  ["Nghiên cứu buyer & định giá","Danh sách buyer + bảng giá chào","Buyer & Giá FOB","#buyer"],
+  ["Tiếp cận buyer","Hội chợ / sàn B2B / email-LinkedIn","8 thị trường (hội chợ)","#thitruong"],
+  ["Gửi mẫu & đàm phán","Chốt giá, Incoterms, thanh toán, MOQ","Giá FOB & chi phí","#buyer"],
+  ["Ký hợp đồng ngoại thương","Sales Contract / Proforma Invoice",null,null],
+ ]},
+ {p:2,t:"Giai đoạn 2 · Chuẩn bị & tuân thủ lô hàng",time:"2–6 tuần/đơn",steps:[
+  ["Chuẩn bị hồ sơ tuân thủ thị trường","Đáp ứng FDA/FSVP (Mỹ), EUDR/BRCGS (EU)","Checklist","#checklist"],
+  ["Sản xuất theo đơn & kiểm soát chất lượng","Lô đạt spec, QC/COA từng lô","Checklist mục A","#checklist"],
+  ["Đóng gói, ghi nhãn & kiểm nghiệm lô","Hàng đóng gói đúng quy cách + kết quả test","Checklist","#checklist"],
+ ]},
+ {p:3,t:"Giai đoạn 3 · Logistics & thông quan xuất",time:"1–2 tuần",steps:[
+  ["Booking tàu/forwarder & chuẩn bị chứng từ","Lịch tàu + bộ chứng từ (Invoice, P/L, B/L, C/O, COA)","Checklist mục D","#checklist"],
+  ["Khai hải quan XK, thông quan, hun trùng","Tờ khai thông quan; pallet ISPM 15","Checklist mục D","#checklist"],
+  ["Giao hàng lên tàu & gửi bộ chứng từ","Hàng on board; chứng từ tới buyer/ngân hàng",null,null],
+ ]},
+ {p:4,t:"Giai đoạn 4 · Thanh toán & hậu mãi",time:"theo điều kiện",steps:[
+  ["Nhận thanh toán & hoàn thuế","Thu tiền (L/C/TT); hoàn thuế nếu có",null,null],
+  ["Hỗ trợ thông quan nhập & xử lý sự cố","Buyer thông quan thành công; xử lý khiếu nại","Checklist","#checklist"],
+  ["Đánh giá đơn, chăm sóc khách & tái đặt hàng","Khách hài lòng, đơn lặp lại",null,null],
+ ]},
+ {p:5,t:"Giai đoạn 5 · Nâng cấp & mở rộng",time:"liên tục 2026–2030",steps:[
+  ["Đa dạng thị trường, tăng value-added, xây thương hiệu","Giảm rủi ro tập trung, biên cao hơn","Lộ trình 2026–2030","#lotrinh"],
+ ]},
+];
+let qn=0;
+$("#qtWrap").innerHTML=QT.map(ph=>{
+  const steps=ph.steps.map(s=>{
+    qn++;
+    const link=s[3]?`<a class="slink" href="${s[3]}">→ ${s[2]}</a>`:(s[2]?`<span class="sout" style="color:var(--faint)">${s[2]}</span>`:"");
+    return `<div class="qt-step"><div class="sn"><span class="snum">${qn}</span><span class="stt">${s[0]}</span></div>
+      <span class="sout">${s[1]}</span>${link}</div>`;
+  }).join('');
+  return `<div class="qt-phase qt-p${ph.p}"><span class="qt-badge">${ph.p}</span>
+    <div class="qt-head"><span class="qh">${ph.t}</span><span class="qtime">⏱ ${ph.time}</span></div>
+    <div class="qt-steps">${steps}</div></div>`;
+}).join('');
+
+// Theme toggle
+const root=document.documentElement,tb=$("#themeBtn");
+tb.addEventListener('click',()=>{
+  const cur=root.getAttribute('data-theme');
+  const isDark=cur?cur==='dark':matchMedia('(prefers-color-scheme:dark)').matches;
+  root.setAttribute('data-theme',isDark?'light':'dark');
+});
+
+// Hero background — subtle isobath / contour lines (sea + land motif)
+const cv=$("#heroCanvas");
+function drawHero(){
+  const dpr=Math.min(devicePixelRatio||1,2);
+  const w=cv.offsetWidth,h=cv.offsetHeight;
+  cv.width=w*dpr;cv.height=h*dpr;
+  const ctx=cv.getContext('2d');ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,w,h);
+  ctx.strokeStyle='rgba(185,134,47,.16)';ctx.lineWidth=1;
+  for(let k=0;k<9;k++){
+    ctx.beginPath();
+    for(let x=0;x<=w;x+=8){
+      const y=h*0.5+Math.sin(x*0.006+k*0.7)*(26+k*7)+k*18-70;
+      x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+}
+drawHero();addEventListener('resize',drawHero);
+</script>
