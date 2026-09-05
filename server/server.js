@@ -9,6 +9,7 @@ import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { YoutubeTranscript } from 'youtube-transcript';
 import { PDFParse } from 'pdf-parse';
+import ExcelJS from 'exceljs';
 
 dotenv.config();
 
@@ -346,16 +347,18 @@ app.post('/api/insight', async (req, res) => {
   const apiKey = s.openaiKey || process.env.OPENAI_API_KEY;
   if (!apiKey) return res.status(400).json({ error: 'Chưa cấu hình OpenAI API key. Vào ⚙️ Cài đặt để thêm.' });
 
-  const { resourceId, regenerate } = req.body || {};
+  const { resourceId, regenerate, userPrompt } = req.body || {};
+  const customPrompt = String(userPrompt || '').trim().slice(0, 1000);
   const lib = loadLibrary();
   const r = lib.resources.find(x => x.id === resourceId);
   if (!r) return res.status(404).json({ error: 'Không tìm thấy tài liệu' });
-  if (r.insight && !regenerate)
+  if (r.insight && !regenerate && !customPrompt)
     return res.json({ insight: r.insight.text, source: r.insight.source, cached: true, createdAt: r.insight.createdAt });
 
   const model = s.model || process.env.OPENAI_MODEL || 'gpt-4o-mini';
   const ctx = sessionContext(r.sessionId);
-  const system = `Bạn là chuyên gia xuất nhập khẩu kiêm trợ giảng. Đọc nội dung tài liệu/video rồi rút ra insight bài học ứng dụng cho một nhà xuất khẩu Việt Nam đang học phần: ${ctx}. Viết tiếng Việt, thực chiến, súc tích. Nếu nội dung mỏng, nêu rõ điều đó thay vì bịa.`;
+  const system = `Bạn là chuyên gia xuất nhập khẩu kiêm trợ giảng. Đọc nội dung tài liệu/video rồi rút ra insight bài học ứng dụng cho một nhà xuất khẩu Việt Nam đang học phần: ${ctx}. Viết tiếng Việt, thực chiến, súc tích. Nếu nội dung mỏng, nêu rõ điều đó thay vì bịa.`
+    + (customPrompt ? `\n\nYÊU CẦU RIÊNG CỦA NGƯỜI DÙNG (ưu tiên bám sát): ${customPrompt}` : '');
 
   try {
     let content, source;
@@ -538,6 +541,100 @@ app.post('/api/knowledge/generate', async (req, res) => {
     res.json({ candidates, kind });
   } catch (e) {
     res.status(502).json({ error: String(e.message || e) });
+  }
+});
+
+// ---------- Thư viện Template: AI sinh biểu mẫu → tải .xlsx, nhóm theo bài học ----------
+function parseJsonObject(text) {
+  if (!text) return null;
+  let t = String(text).trim().replace(/^```(?:json)?/i, '').replace(/```$/, '').trim();
+  const a = t.indexOf('{'), b = t.lastIndexOf('}');
+  if (a === -1 || b === -1) return null;
+  try { return JSON.parse(t.slice(a, b + 1)); } catch { return null; }
+}
+
+// AI thiết kế cấu trúc template theo giai đoạn (trả JSON spec, chưa tạo file)
+app.post('/api/template/generate', async (req, res) => {
+  const s = loadSettings();
+  const apiKey = s.openaiKey || process.env.OPENAI_API_KEY;
+  if (!apiKey) return res.status(400).json({ error: 'Chưa cấu hình OpenAI API key. Vào ⚙️ Cài đặt để thêm.' });
+  const { sessionId, userPrompt } = req.body || {};
+  const model = s.model || process.env.OPENAI_MODEL || 'gpt-4o-mini';
+  const ctx = sessionContext(sessionId);
+  const custom = String(userPrompt || '').trim().slice(0, 1000);
+  const prompt = `Với chủ đề đang học: "${ctx}", hãy THIẾT KẾ MỘT biểu mẫu (template) Excel thực dụng mà nhà xuất khẩu Việt Nam một người cần dùng ở phần này.${custom ? ` Yêu cầu riêng: ${custom}.` : ''}\nĐặt tên cột song ngữ Việt–Anh khi phù hợp, thêm 1–3 dòng ví dụ mẫu để người dùng hình dung.\nTrả về DUY NHẤT một JSON hợp lệ, không thêm chữ nào khác, dạng:\n{"name":"Tên template","description":"1-2 câu mô tả cách dùng","sheets":[{"name":"Tên sheet","columns":["Cột 1","Cột 2"],"sampleRows":[["ví dụ 1","ví dụ 2"]],"notes":"ghi chú cách dùng (tuỳ chọn)"}]}`;
+  try {
+    const r = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST', headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model, temperature: 0.3,
+        messages: [
+          { role: 'system', content: 'Bạn là chuyên gia vận hành xuất khẩu, thiết kế biểu mẫu Excel gọn, thực chiến. Chỉ trả JSON đúng định dạng được yêu cầu.' },
+          { role: 'user', content: prompt }
+        ]
+      })
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error?.message || 'Lỗi OpenAI');
+    const spec = parseJsonObject(data.choices?.[0]?.message?.content || '');
+    if (!spec || !Array.isArray(spec.sheets) || !spec.sheets.length) throw new Error('AI không trả về cấu trúc hợp lệ');
+    res.json({ template: spec });
+  } catch (e) {
+    res.status(502).json({ error: String(e.message || e) });
+  }
+});
+
+// Dựng file .xlsx từ spec rồi lưu vào thư viện (kind=template) để tải về
+app.post('/api/template/xlsx', async (req, res) => {
+  const { sessionId, template, title } = req.body || {};
+  const spec = template && typeof template === 'object' ? template : null;
+  if (!spec || !Array.isArray(spec.sheets) || !spec.sheets.length)
+    return res.status(400).json({ error: 'Thiếu cấu trúc template' });
+  try {
+    const wb = new ExcelJS.Workbook();
+    wb.creator = 'Học Xuất khẩu End-to-End';
+    for (const sh of spec.sheets.slice(0, 12)) {
+      const cols = (Array.isArray(sh.columns) ? sh.columns : []).map(c => String(c)).slice(0, 60);
+      const ws = wb.addWorksheet(String(sh.name || 'Sheet').slice(0, 31).replace(/[\\/?*[\]:]/g, ' '));
+      if (cols.length) {
+        const header = ws.addRow(cols);
+        header.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+        header.eachCell(c => { c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0B6B4F' } }; c.alignment = { vertical: 'middle', wrapText: true }; });
+        ws.columns = cols.map(c => ({ width: Math.min(Math.max(String(c).length + 4, 14), 40) }));
+        for (const row of (Array.isArray(sh.sampleRows) ? sh.sampleRows : []).slice(0, 50)) {
+          ws.addRow((Array.isArray(row) ? row : [row]).map(v => (v == null ? '' : String(v))).slice(0, cols.length));
+        }
+        ws.views = [{ state: 'frozen', ySplit: 1 }];
+        ws.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: cols.length } };
+      }
+      if (sh.notes) { ws.addRow([]); ws.addRow(['Ghi chú: ' + String(sh.notes)]); }
+    }
+    const buf = await wb.xlsx.writeBuffer();
+    const id = crypto.randomBytes(8).toString('hex');
+    const baseName = String(spec.name || title || 'template').replace(/[^\w.\-]+/g, '_').slice(0, 50) || 'template';
+    const fileName = `${id}__${baseName}.xlsx`;
+    fs.writeFileSync(path.join(UPLOAD_DIR, fileName), Buffer.from(buf));
+    const lib = loadLibrary();
+    const item = {
+      id,
+      sessionId: sessionId || 'general',
+      type: 'link',
+      kind: 'template',
+      question: '',
+      title: (title || spec.name || 'Template Excel').trim(),
+      url: `/uploads/${fileName}`,
+      note: String(spec.description || ''),
+      tags: ['template', 'excel'],
+      file: { name: `${baseName}.xlsx`, size: Buffer.from(buf).length, mime: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' },
+      images: [],
+      template: spec,
+      createdAt: Date.now()
+    };
+    lib.resources.push(item);
+    saveLibrary(lib);
+    res.json({ resource: item });
+  } catch (e) {
+    res.status(500).json({ error: String(e.message || e) });
   }
 });
 

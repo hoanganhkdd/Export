@@ -471,7 +471,7 @@ function resourceCard(r, showSession) {
   } else if (r.type === 'link') {
     media = `<div class="res-media doc">🔗</div>`;
   }
-  const kindLabel = { example: '🌍 Ví dụ (Đào sâu)', tool: '🧰 Công cụ (Đào sâu)', qa: '🤔 Hỏi AI (Đào sâu)', quiz: '📝 Kết quả kiểm tra' };
+  const kindLabel = { example: '🌍 Ví dụ (Đào sâu)', tool: '🧰 Công cụ (Đào sâu)', qa: '🤔 Hỏi AI (Đào sâu)', quiz: '📝 Kết quả kiểm tra', template: '📐 Template Excel' };
   const typeLabel = kindLabel[r.kind] || { text: '📝 Ghi chú', image: '🖼️ Ảnh', pdf: '📄 PDF', youtube: '▶️ YouTube', facebook: '🎬 Facebook Reel', link: '🔗 Liên kết', gdrive: '📁 Google Drive' }[r.type] || r.type;
   const sess = state.byId[r.sessionId];
   card.innerHTML = media + `
@@ -509,25 +509,33 @@ function renderInsight(box, r) {
       <div class="insight-text">${formatMarkdown(r.insight.text)}</div>`;
     const regen = el('button', 'btn sm', '🔄 Tạo lại insight');
     regen.onclick = () => generateInsight(r, box, true);
-    det.append(regen);
+    const custom = el('button', 'btn sm', '🎯 Prompt riêng');
+    custom.onclick = () => askInsightPrompt(r, box);
+    det.append(regen); det.append(custom);
     box.append(det);
   } else {
     const btn = el('button', 'btn sm insight-btn', '✨ Rút insight bài học');
     btn.onclick = () => generateInsight(r, box, false);
-    box.append(btn);
+    const custom = el('button', 'btn sm', '🎯 Prompt riêng');
+    custom.onclick = () => askInsightPrompt(r, box);
+    box.append(btn); box.append(custom);
   }
 }
-async function generateInsight(r, box, regenerate) {
+function askInsightPrompt(r, box) {
+  const p = prompt('Nhập yêu cầu riêng để AI rút insight theo ý bạn (vd: "tập trung vào rủi ro thanh toán", "liệt kê checklist chứng từ"):', '');
+  if (p && p.trim()) generateInsight(r, box, true, p.trim());
+}
+async function generateInsight(r, box, regenerate, userPrompt) {
   box.innerHTML = `<div class="insight-loading">⏳ AI đang đọc ${RES_LABEL[r.type] || 'tài liệu'} và rút insight…</div>`;
   try {
     const resp = await fetch('/api/insight', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ resourceId: r.id, regenerate: !!regenerate })
+      body: JSON.stringify({ resourceId: r.id, regenerate: !!regenerate, userPrompt: userPrompt || '' })
     });
     const d = await resp.json();
     if (!resp.ok) {
       box.innerHTML = `<div class="insight-error">⚠️ ${esc(d.error || 'Lỗi')}</div>`;
-      const retry = el('button', 'btn sm', 'Thử lại'); retry.onclick = () => generateInsight(r, box, regenerate);
+      const retry = el('button', 'btn sm', 'Thử lại'); retry.onclick = () => generateInsight(r, box, regenerate, userPrompt);
       box.append(retry); return;
     }
     r.insight = { text: d.insight, source: d.source, createdAt: d.createdAt };
@@ -1207,6 +1215,121 @@ async function maybeDailyNews() {
   if (hasItems && seen !== today) openNewsModal();
 }
 
+// ---------- Thư viện Template (Excel) ----------
+let tplCandidate = null;   // spec đang xem trước, chờ lưu
+async function openTemplateModal() {
+  const sel = $('#tplSession');
+  if (sel.options.length === 0) {
+    const def = el('option'); def.value = ''; def.textContent = 'Chung (không theo giai đoạn)'; sel.append(def);
+    for (const s of state.sessions) { const o = el('option'); o.value = s.id; o.textContent = s.title_vi; sel.append(o); }
+  }
+  if (state.byId[state.current]) sel.value = state.current;
+  $('#tplPreview').hidden = true; $('#tplPreview').innerHTML = ''; tplCandidate = null;
+  showModal('#templateModal');
+  await loadTemplateList();
+}
+async function loadTemplateList() {
+  const box = $('#tplList');
+  box.innerHTML = '<div class="muted small">Đang tải…</div>';
+  const items = await fetchResources({ kind: 'template' });
+  if (!items.length) { box.innerHTML = '<div class="news-empty">Chưa có template nào. Chọn giai đoạn và bấm ✨ Tạo template bằng AI.</div>'; return; }
+  // nhóm theo module của session
+  const groups = {};
+  for (const r of items) {
+    const s = state.byId[r.sessionId];
+    const g = s ? s.module : 'Chung';
+    (groups[g] ||= []).push(r);
+  }
+  box.innerHTML = '';
+  for (const [mod, list] of Object.entries(groups)) {
+    box.append(el('div', 'tpl-group-title', mod));
+    const grid = el('div', 'tpl-grid');
+    for (const r of list) grid.append(templateCard(r));
+    box.append(grid);
+  }
+}
+function templateCard(r) {
+  const card = el('div', 'tpl-card');
+  const s = state.byId[r.sessionId];
+  const nSheets = r.template?.sheets?.length || 0;
+  card.innerHTML = `
+    <div class="tpl-card-h">📐 ${esc(r.title)}</div>
+    ${s ? `<div class="muted small">${esc(s.title_vi)}</div>` : ''}
+    ${r.note ? `<div class="tpl-desc">${esc(r.note)}</div>` : ''}
+    ${nSheets ? `<div class="muted small">${nSheets} sheet · ${r.template.sheets.map(sh => esc(sh.name)).join(', ')}</div>` : ''}
+    <div class="tpl-card-foot">
+      <a class="btn sm primary" href="${esc(r.url)}" download>⬇️ Tải .xlsx</a>
+      <button class="btn sm danger-text" title="Xóa">🗑</button>
+    </div>`;
+  $('.danger-text', card).onclick = async () => {
+    if (!confirm('Xóa template này?')) return;
+    await fetch('/api/resources/' + r.id, { method: 'DELETE' });
+    await refreshResourceCounts(); renderNav($('#sessionSearch').value);
+    loadTemplateList();
+  };
+  return card;
+}
+async function generateTemplate() {
+  const btn = $('#btnTplGen'); const old = btn.textContent;
+  const sessionId = $('#tplSession').value;
+  const userPrompt = $('#tplPrompt').value.trim();
+  const prev = $('#tplPreview');
+  btn.disabled = true; btn.textContent = '⏳ Đang thiết kế…';
+  prev.hidden = false; prev.innerHTML = '<div class="muted small">AI đang thiết kế biểu mẫu…</div>';
+  try {
+    const r = await fetch('/api/template/generate', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sessionId, userPrompt })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Lỗi tạo template');
+    tplCandidate = d.template;
+    renderTemplatePreview(d.template, sessionId);
+  } catch (e) {
+    prev.innerHTML = `<div class="form-error">${esc(String(e.message || e))}</div>`;
+  } finally { btn.disabled = false; btn.textContent = old; }
+}
+function renderTemplatePreview(spec, sessionId) {
+  const prev = $('#tplPreview');
+  const sheets = (spec.sheets || []).map(sh => `
+    <div class="tpl-sheet">
+      <div class="tpl-sheet-name">📄 ${esc(sh.name || 'Sheet')}</div>
+      <div class="tpl-tbl-wrap"><table class="slide-table"><tr>${(sh.columns || []).map(c => `<th>${esc(c)}</th>`).join('')}</tr>
+      ${(sh.sampleRows || []).slice(0, 3).map(row => `<tr>${(sh.columns || []).map((_, i) => `<td>${esc(String((row || [])[i] ?? ''))}</td>`).join('')}</tr>`).join('')}
+      </table></div>
+      ${sh.notes ? `<div class="muted small">Ghi chú: ${esc(sh.notes)}</div>` : ''}
+    </div>`).join('');
+  prev.innerHTML = `
+    <div class="tpl-prev-h">Xem trước: <b>${esc(spec.name || 'Template')}</b></div>
+    ${spec.description ? `<div class="muted small">${esc(spec.description)}</div>` : ''}
+    ${sheets}
+    <div class="modal-actions">
+      <button class="btn" id="btnTplDiscard">Bỏ</button>
+      <button class="btn primary" id="btnTplSave">💾 Lưu & tạo .xlsx</button>
+    </div>
+    <div class="form-error" id="tplSaveErr"></div>`;
+  $('#btnTplDiscard').onclick = () => { prev.hidden = true; prev.innerHTML = ''; tplCandidate = null; };
+  $('#btnTplSave').onclick = () => saveTemplate(sessionId);
+}
+async function saveTemplate(sessionId) {
+  if (!tplCandidate) return;
+  const btn = $('#btnTplSave'); const old = btn.textContent; btn.disabled = true; btn.textContent = '⏳ Đang tạo file…';
+  try {
+    const r = await fetch('/api/template/xlsx', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId, template: tplCandidate, title: tplCandidate.name })
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Lỗi tạo .xlsx');
+    $('#tplPreview').hidden = true; $('#tplPreview').innerHTML = ''; tplCandidate = null;
+    $('#tplPrompt').value = '';
+    await refreshResourceCounts(); renderNav($('#sessionSearch').value);
+    await loadTemplateList();
+  } catch (e) {
+    const box = $('#tplSaveErr'); if (box) box.textContent = String(e.message || e);
+    btn.disabled = false; btn.textContent = old;
+  }
+}
+
 // ---------- Modal helpers & global UI ----------
 function showModal(sel) { $(sel).hidden = false; }
 function hideModal(sel) { $(sel).hidden = true; }
@@ -1221,6 +1344,8 @@ function bindGlobalUI() {
   });
   $('#btnNews').onclick = openNewsModal;
   $('#btnNewsRefresh').onclick = refreshNews;
+  $('#btnTemplates').onclick = openTemplateModal;
+  $('#btnTplGen').onclick = generateTemplate;
   $('#btnLibrary').onclick = openLibrary;
   $('#btnSettings').onclick = openSettings;
   $('#btnTheme').onclick = () => applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');

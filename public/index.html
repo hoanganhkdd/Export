@@ -23,6 +23,7 @@
         <span id="progressText" class="progress-text">0%</span>
       </div>
       <button class="btn ghost" id="btnNews" title="Tin tức & kiến thức ngành mới">📰 Tin tức<span class="news-dot" id="newsDot" hidden></span></button>
+      <button class="btn ghost" id="btnTemplates" title="Thư viện biểu mẫu Excel theo bài học">📐 Template</button>
       <button class="btn ghost" id="btnLibrary">📚 Thư viện chung</button>
       <button class="btn ghost" id="btnSettings" title="Cài đặt AI">⚙️</button>
       <button class="btn ghost icon" id="btnTheme" title="Đổi giao diện sáng/tối">🌙</button>
@@ -40,6 +41,27 @@
     <main class="main" id="main">
       <div class="loading" id="loading">Đang tải giáo án…</div>
     </main>
+  </div>
+
+  <!-- Modal: Thư viện Template -->
+  <div class="modal-backdrop" id="templateModal" hidden>
+    <div class="modal wide">
+      <div class="modal-head">
+        <h2>📐 Thư viện Template (Excel)</h2>
+        <button class="btn ghost icon" data-close>✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="tpl-gen">
+          <div class="tpl-gen-row">
+            <select id="tplSession" title="Chọn giai đoạn/bài học"></select>
+            <input type="text" id="tplPrompt" placeholder="Mô tả template cần tạo (tuỳ chọn, vd: bảng theo dõi buyer 13 trường)…" />
+            <button class="btn primary" id="btnTplGen">✨ Tạo template bằng AI</button>
+          </div>
+          <div class="tpl-preview" id="tplPreview" hidden></div>
+        </div>
+        <div class="tpl-list" id="tplList"></div>
+      </div>
+    </div>
   </div>
 
   <!-- Modal: Tin tức ngành -->

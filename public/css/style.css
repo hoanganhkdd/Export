@@ -419,6 +419,26 @@ table.slide-table tr:first-child td { background: var(--surface-2); font-weight:
 .res-gallery a { display: block; width: 80px; height: 80px; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
 .res-gallery img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
+/* ---------- Thư viện Template ---------- */
+.tpl-gen { border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 16px; background: var(--surface-2); }
+.tpl-gen-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.tpl-gen-row select, .tpl-gen-row input { padding: 8px 10px; border: 1px solid var(--border); border-radius: 9px; background: var(--surface); color: var(--text); font-family: inherit; font-size: .86rem; }
+.tpl-gen-row input { flex: 1; min-width: 200px; }
+.tpl-preview { margin-top: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 11px; padding: 13px; }
+.tpl-prev-h { font-weight: 700; margin-bottom: 4px; }
+.tpl-sheet { margin-top: 12px; }
+.tpl-sheet-name { font-weight: 600; font-size: .9rem; margin-bottom: 5px; }
+.tpl-tbl-wrap { overflow-x: auto; }
+.tpl-preview table.slide-table { border-collapse: collapse; width: 100%; font-size: .8rem; }
+.tpl-preview table.slide-table th, .tpl-preview table.slide-table td { border: 1px solid var(--border); padding: 5px 8px; text-align: left; }
+.tpl-preview table.slide-table th { background: var(--brand); color: #fff; }
+.tpl-group-title { font-weight: 700; color: var(--text-2); margin: 16px 0 8px; font-size: .82rem; text-transform: uppercase; letter-spacing: .3px; }
+.tpl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.tpl-card { border: 1px solid var(--border); border-radius: 12px; padding: 13px 14px; background: var(--surface); display: flex; flex-direction: column; gap: 5px; }
+.tpl-card-h { font-weight: 700; font-size: .95rem; }
+.tpl-desc { font-size: .84rem; color: var(--text-2); }
+.tpl-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; }
+
 @media (max-width: 860px) {
   .sidebar { position: fixed; z-index: 50; left: 0; transform: translateX(-100%); transition: transform .25s; box-shadow: var(--shadow); }
   .sidebar.open { transform: translateX(0); }
