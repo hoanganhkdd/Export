@@ -77,6 +77,7 @@
             <option value="youtube">▶️ YouTube</option>
             <option value="facebook">🎬 Facebook Reel</option>
             <option value="link">🔗 Liên kết</option>
+            <option value="gdrive">📁 Google Drive</option>
           </select>
           <select id="libSessionFilter"><option value="">Tất cả session</option></select>
           <button class="btn" id="btnExportMd" title="Xuất danh sách đang lọc ra file Markdown">⬇️ Xuất .md</button>
@@ -132,14 +133,15 @@
           <button data-type="youtube">▶️ YouTube</button>
           <button data-type="facebook">🎬 FB Reel</button>
           <button data-type="link">🔗 Link</button>
+          <button data-type="gdrive">📁 Google Drive</button>
         </div>
         <form id="addResForm">
           <input type="hidden" name="type" value="text" />
           <label class="field"><span>Tiêu đề</span>
             <input type="text" name="title" placeholder="Đặt tên tài liệu (tùy chọn)" /></label>
 
-          <label class="field" data-when="youtube facebook link"><span>URL nguồn</span>
-            <input type="url" name="url" placeholder="Dán link vào đây" /></label>
+          <label class="field" data-when="youtube facebook link gdrive"><span>URL nguồn</span>
+            <input type="url" name="url" placeholder="Dán link vào đây (Google Drive/Docs/Sheets/Slides/Folder đều được)" /></label>
 
           <label class="field" data-when="text"><span>Nội dung</span>
             <textarea name="note" rows="5" placeholder="Dán đoạn text / ghi chú… (có thể dán ảnh Ctrl+V vào ô ảnh bên dưới)"></textarea></label>
@@ -158,7 +160,7 @@
           <label class="field" data-when="pdf"><span>Chọn file PDF</span>
             <input type="file" name="file" accept="application/pdf" /></label>
 
-          <label class="field" data-when="youtube facebook link image pdf"><span>Ghi chú (tùy chọn)</span>
+          <label class="field" data-when="youtube facebook link image pdf gdrive"><span>Ghi chú (tùy chọn)</span>
             <textarea name="noteExtra" rows="2" placeholder="Vì sao tài liệu này hữu ích…"></textarea></label>
 
           <label class="field"><span>Tags (phân cách bằng dấu phẩy)</span>

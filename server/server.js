@@ -100,7 +100,7 @@ app.get('/api/resources', (req, res) => {
 // Thêm tài liệu dạng link/text (JSON)
 app.post('/api/resources', (req, res) => {
   const { sessionId, type, title, url, note, tags, kind, question } = req.body || {};
-  const allowed = ['text', 'youtube', 'facebook', 'link', 'pdf', 'image'];
+  const allowed = ['text', 'youtube', 'facebook', 'link', 'pdf', 'image', 'gdrive'];
   if (!allowed.includes(type)) return res.status(400).json({ error: 'type không hợp lệ' });
   // Ảnh đính kèm (đã upload trước qua /api/resources/upload-images) — dùng cho ghi chú có ảnh hoặc resource ảnh nhiều tấm
   const images = Array.isArray(req.body?.images)
@@ -108,7 +108,7 @@ app.post('/api/resources', (req, res) => {
         .filter(im => im && typeof im.url === 'string' && im.url.startsWith('/uploads/'))
         .map(im => ({ url: im.url, name: String(im.name || '').slice(0, 200), size: +im.size || 0, mime: String(im.mime || '') }))
     : [];
-  if ((type === 'youtube' || type === 'facebook' || type === 'link') && !url)
+  if ((type === 'youtube' || type === 'facebook' || type === 'link' || type === 'gdrive') && !url)
     return res.status(400).json({ error: 'Thiếu URL' });
   if (type === 'text' && !note && !images.length)
     return res.status(400).json({ error: 'Thiếu nội dung text hoặc ảnh' });
@@ -186,6 +186,7 @@ app.delete('/api/resources/:id', (req, res) => {
 function defaultTitle(type, url) {
   if (type === 'youtube') return 'Video YouTube';
   if (type === 'facebook') return 'Facebook Reel';
+  if (type === 'gdrive') return 'Tài liệu Google Drive';
   if (type === 'link') { try { return new URL(url).hostname; } catch { return 'Liên kết'; } }
   if (type === 'text') return 'Ghi chú';
   return 'Tài liệu';

@@ -463,11 +463,16 @@ function resourceCard(r, showSession) {
     media = `<div class="res-media"><a href="${esc(r.url)}" target="_blank"><img src="${esc(r.url)}" alt="" loading="lazy"></a></div>`;
   } else if (r.type === 'pdf') {
     media = `<div class="res-media doc">📄</div>`;
+  } else if (r.type === 'gdrive') {
+    const emb = gdriveEmbed(r.url);
+    media = emb
+      ? `<div class="res-media"><iframe src="${esc(emb)}" allowfullscreen loading="lazy"></iframe></div>`
+      : `<div class="res-media doc">📁</div>`;
   } else if (r.type === 'link') {
     media = `<div class="res-media doc">🔗</div>`;
   }
   const kindLabel = { example: '🌍 Ví dụ (Đào sâu)', tool: '🧰 Công cụ (Đào sâu)', qa: '🤔 Hỏi AI (Đào sâu)', quiz: '📝 Kết quả kiểm tra' };
-  const typeLabel = kindLabel[r.kind] || { text: '📝 Ghi chú', image: '🖼️ Ảnh', pdf: '📄 PDF', youtube: '▶️ YouTube', facebook: '🎬 Facebook Reel', link: '🔗 Liên kết' }[r.type] || r.type;
+  const typeLabel = kindLabel[r.kind] || { text: '📝 Ghi chú', image: '🖼️ Ảnh', pdf: '📄 PDF', youtube: '▶️ YouTube', facebook: '🎬 Facebook Reel', link: '🔗 Liên kết', gdrive: '📁 Google Drive' }[r.type] || r.type;
   const sess = state.byId[r.sessionId];
   card.innerHTML = media + `
     <div class="res-body">
@@ -478,7 +483,7 @@ function resourceCard(r, showSession) {
       ${r.tags?.length ? `<div class="res-tags">${r.tags.map(t => `<span class="res-tag">#${esc(t)}</span>`).join('')}</div>` : ''}
       <div class="res-insight"></div>
       <div class="res-foot">
-        ${r.url ? `<a class="res-src" href="${esc(r.url)}" target="_blank" rel="noopener">${r.type === 'pdf' ? '📂 Mở file' : '🔗 Nguồn'}</a>` : '<span></span>'}
+        ${r.url ? `<a class="res-src" href="${esc(r.url)}" target="_blank" rel="noopener">${r.type === 'pdf' ? '📂 Mở file' : r.type === 'gdrive' ? '📁 Mở trong Drive' : '🔗 Nguồn'}</a>` : '<span></span>'}
         <button class="btn danger-text" title="Xóa">🗑</button>
       </div>
       ${showSession && sess ? `<div class="res-session">Session: ${esc(sess.title_vi)}</div>` : ''}
@@ -549,6 +554,22 @@ function formatMarkdown(t) {
 function ytId(url) {
   const m = String(url).match(/(?:youtu\.be\/|v=|\/embed\/|\/shorts\/)([\w-]{11})/);
   return m ? m[1] : null;
+}
+// Chuyển link Google Drive/Docs/Sheets/Slides/Folder thành URL nhúng xem trực tiếp
+function gdriveEmbed(url) {
+  const u = String(url || '');
+  let m;
+  if ((m = u.match(/\/(?:document|spreadsheets|presentation)\/d\/([\w-]+)/))) {
+    const kind = u.includes('/presentation/') ? 'presentation' : u.includes('/spreadsheets/') ? 'spreadsheets' : 'document';
+    return `https://docs.google.com/${kind}/d/${m[1]}/preview`;
+  }
+  if ((m = u.match(/\/file\/d\/([\w-]+)/)) || (m = u.match(/[?&]id=([\w-]+)/))) {
+    return `https://drive.google.com/file/d/${m[1]}/preview`;
+  }
+  if ((m = u.match(/\/folders\/([\w-]+)/))) {
+    return `https://drive.google.com/embeddedfolderview?id=${m[1]}#grid`;
+  }
+  return null;
 }
 
 // ---------- Add resource modal ----------
