@@ -459,7 +459,7 @@ function resourceCard(r, showSession) {
   } else if (r.type === 'facebook') {
     const src = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(r.url)}&show_text=false`;
     media = `<div class="res-media"><div class="fb-wrap"><iframe src="${src}" allowfullscreen loading="lazy" scrolling="no"></iframe></div></div>`;
-  } else if (r.type === 'image') {
+  } else if (r.type === 'image' && r.url && !(r.images?.length)) {
     media = `<div class="res-media"><a href="${esc(r.url)}" target="_blank"><img src="${esc(r.url)}" alt="" loading="lazy"></a></div>`;
   } else if (r.type === 'pdf') {
     media = `<div class="res-media doc">📄</div>`;
@@ -474,6 +474,7 @@ function resourceCard(r, showSession) {
       <span class="res-type">${typeLabel}</span>
       <div class="res-title">${esc(r.title)}</div>
       ${r.note ? `<div class="res-note">${esc(r.note)}</div>` : ''}
+      ${r.images?.length ? `<div class="res-gallery">${r.images.map(im => `<a href="${esc(im.url)}" target="_blank" rel="noopener"><img src="${esc(im.url)}" alt="" loading="lazy"></a>`).join('')}</div>` : ''}
       ${r.tags?.length ? `<div class="res-tags">${r.tags.map(t => `<span class="res-tag">#${esc(t)}</span>`).join('')}</div>` : ''}
       <div class="res-insight"></div>
       <div class="res-foot">
@@ -552,11 +553,14 @@ function ytId(url) {
 
 // ---------- Add resource modal ----------
 let addSessionId = 'general';
+let pendingImages = [];      // ảnh đã upload chờ gắn vào resource: [{url,name,size,mime}]
 function openAddModal(sessionId, sessionTitle, type = 'text') {
   addSessionId = sessionId;
   $('#addTarget').innerHTML = `Sẽ lưu vào session: <b>${esc(sessionTitle || 'Chung')}</b>`;
   $('#addResError').textContent = '';
   $('#addResForm').reset();
+  pendingImages = [];
+  renderImgThumbs();
   setResType(type);
   showModal('#addResModal');
 }
@@ -565,6 +569,51 @@ function setResType(type) {
   $('#addResForm [name=type]').value = type;
   $$('#addResForm .field[data-when]').forEach(f => {
     f.style.display = f.dataset.when.split(' ').includes(type) ? '' : 'none';
+  });
+}
+
+// ---------- Ảnh dán/đính kèm ----------
+function renderImgThumbs() {
+  const box = $('#imgThumbs'); if (!box) return;
+  box.innerHTML = '';
+  pendingImages.forEach((im, i) => {
+    const t = el('div', 'img-thumb');
+    t.innerHTML = `<img src="${esc(im.url)}" alt=""><button type="button" class="x" title="Bỏ ảnh">✕</button>`;
+    $('.x', t).onclick = () => { pendingImages.splice(i, 1); renderImgThumbs(); };
+    box.append(t);
+  });
+}
+async function uploadImages(fileList) {
+  const files = [...(fileList || [])].filter(f => /^image\//.test(f.type));
+  if (!files.length) return;
+  const box = $('#imgThumbs');
+  const ph = el('div', 'img-thumb uploading', '⏳'); if (box) box.append(ph);
+  try {
+    const fd = new FormData();
+    files.forEach(f => fd.append('files', f));
+    const r = await fetch('/api/resources/upload-images', { method: 'POST', body: fd });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Lỗi tải ảnh');
+    pendingImages.push(...d.files);
+  } catch (e) {
+    const err = $('#addResError'); if (err) err.textContent = String(e.message || e);
+  } finally {
+    renderImgThumbs();
+  }
+}
+function bindImageInputs() {
+  const drop = $('#imgDrop'), input = $('#imgInput'), pick = $('#imgPick');
+  if (!drop || drop.dataset.bound) return;
+  drop.dataset.bound = '1';
+  pick.onclick = () => input.click();
+  input.onchange = () => { uploadImages(input.files); input.value = ''; };
+  ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('drag'); }));
+  ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); if (ev === 'dragleave' && drop.contains(e.relatedTarget)) return; drop.classList.remove('drag'); }));
+  drop.addEventListener('drop', e => { if (e.dataTransfer?.files?.length) uploadImages(e.dataTransfer.files); });
+  // Dán ảnh (Ctrl+V) khi modal thêm tài liệu đang mở
+  $('#addResModal').addEventListener('paste', e => {
+    const imgs = [...(e.clipboardData?.items || [])].filter(it => it.type.startsWith('image/')).map(it => it.getAsFile()).filter(Boolean);
+    if (imgs.length) { e.preventDefault(); uploadImages(imgs); }
   });
 }
 
@@ -1165,6 +1214,9 @@ function bindGlobalUI() {
   // add-resource type picker
   $$('#typePicker button').forEach(b => b.onclick = () => setResType(b.dataset.type));
 
+  // add-resource: dán/kéo-thả/chọn nhiều ảnh
+  bindImageInputs();
+
   // add-resource submit
   $('#addResForm').addEventListener('submit', submitAddResource);
 
@@ -1192,9 +1244,9 @@ async function submitAddResource(e) {
   const tags = form.tags.value.trim();
   try {
     let created;
-    if (type === 'image' || type === 'pdf') {
+    if (type === 'pdf') {
       const file = form.file.files[0];
-      if (!file) throw new Error('Hãy chọn một file.');
+      if (!file) throw new Error('Hãy chọn một file PDF.');
       const fd = new FormData();
       fd.append('file', file);
       fd.append('sessionId', addSessionId);
@@ -1207,9 +1259,11 @@ async function submitAddResource(e) {
     } else {
       const note = type === 'text' ? form.note.value.trim() : form.noteExtra.value.trim();
       const url = form.url.value.trim();
+      if (type === 'image' && !pendingImages.length) throw new Error('Hãy dán hoặc chọn ít nhất một ảnh.');
+      if (type === 'text' && !note && !pendingImages.length) throw new Error('Hãy nhập nội dung hoặc thêm ảnh.');
       const r = await fetch('/api/resources', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sessionId: addSessionId, type, title, url, note, tags })
+        body: JSON.stringify({ sessionId: addSessionId, type, title, url, note, tags, images: pendingImages })
       });
       created = await r.json();
       if (!r.ok) throw new Error(created.error || 'Lỗi lưu');

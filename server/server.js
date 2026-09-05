@@ -102,10 +102,18 @@ app.post('/api/resources', (req, res) => {
   const { sessionId, type, title, url, note, tags, kind, question } = req.body || {};
   const allowed = ['text', 'youtube', 'facebook', 'link', 'pdf', 'image'];
   if (!allowed.includes(type)) return res.status(400).json({ error: 'type không hợp lệ' });
+  // Ảnh đính kèm (đã upload trước qua /api/resources/upload-images) — dùng cho ghi chú có ảnh hoặc resource ảnh nhiều tấm
+  const images = Array.isArray(req.body?.images)
+    ? req.body.images
+        .filter(im => im && typeof im.url === 'string' && im.url.startsWith('/uploads/'))
+        .map(im => ({ url: im.url, name: String(im.name || '').slice(0, 200), size: +im.size || 0, mime: String(im.mime || '') }))
+    : [];
   if ((type === 'youtube' || type === 'facebook' || type === 'link') && !url)
     return res.status(400).json({ error: 'Thiếu URL' });
-  if (type === 'text' && !note)
-    return res.status(400).json({ error: 'Thiếu nội dung text' });
+  if (type === 'text' && !note && !images.length)
+    return res.status(400).json({ error: 'Thiếu nội dung text hoặc ảnh' });
+  if (type === 'image' && !images.length)
+    return res.status(400).json({ error: 'Thiếu ảnh' });
 
   const lib = loadLibrary();
   const item = {
@@ -119,6 +127,7 @@ app.post('/api/resources', (req, res) => {
     note: note || '',
     tags: Array.isArray(tags) ? tags : (tags ? String(tags).split(',').map(t => t.trim()).filter(Boolean) : []),
     file: null,
+    images,
     createdAt: Date.now()
   };
   lib.resources.push(item);
@@ -148,6 +157,15 @@ app.post('/api/resources/upload', upload.single('file'), (req, res) => {
   res.json({ resource: item });
 });
 
+// Upload nhiều ảnh cùng lúc (dán/kéo-thả/chọn nhiều) — trả về danh sách URL, chưa tạo resource
+app.post('/api/resources/upload-images', upload.array('files', 20), (req, res) => {
+  const files = (req.files || [])
+    .filter(f => /^image\//.test(f.mimetype))
+    .map(f => ({ url: `/uploads/${f.filename}`, name: f.originalname, size: f.size, mime: f.mimetype }));
+  if (!files.length) return res.status(400).json({ error: 'Không có ảnh hợp lệ' });
+  res.json({ files });
+});
+
 // Xóa tài liệu
 app.delete('/api/resources/:id', (req, res) => {
   const lib = loadLibrary();
@@ -157,6 +175,9 @@ app.delete('/api/resources/:id', (req, res) => {
   if (removed.file && removed.url?.startsWith('/uploads/')) {
     const p = path.join(UPLOAD_DIR, path.basename(removed.url));
     fs.rm(p, () => {});
+  }
+  for (const im of removed.images || []) {
+    if (im.url?.startsWith('/uploads/')) fs.rm(path.join(UPLOAD_DIR, path.basename(im.url)), () => {});
   }
   saveLibrary(lib);
   res.json({ ok: true });

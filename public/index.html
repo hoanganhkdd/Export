@@ -142,10 +142,21 @@
             <input type="url" name="url" placeholder="Dán link vào đây" /></label>
 
           <label class="field" data-when="text"><span>Nội dung</span>
-            <textarea name="note" rows="5" placeholder="Dán đoạn text / ghi chú…"></textarea></label>
+            <textarea name="note" rows="5" placeholder="Dán đoạn text / ghi chú… (có thể dán ảnh Ctrl+V vào ô ảnh bên dưới)"></textarea></label>
 
-          <label class="field" data-when="image pdf"><span>Chọn file</span>
-            <input type="file" name="file" /></label>
+          <div class="field" data-when="text image"><span>Ảnh (dán Ctrl+V, kéo-thả, hoặc chọn nhiều ảnh)</span>
+            <div class="img-drop" id="imgDrop" tabindex="0">
+              <input type="file" id="imgInput" accept="image/*" multiple hidden />
+              <div class="img-drop-hint">
+                <button type="button" class="btn sm" id="imgPick">🖼️ Chọn ảnh…</button>
+                <span class="muted small">hoặc dán ảnh (Ctrl+V) / kéo-thả nhiều ảnh vào đây</span>
+              </div>
+              <div class="img-thumbs" id="imgThumbs"></div>
+            </div>
+          </div>
+
+          <label class="field" data-when="pdf"><span>Chọn file PDF</span>
+            <input type="file" name="file" accept="application/pdf" /></label>
 
           <label class="field" data-when="youtube facebook link image pdf"><span>Ghi chú (tùy chọn)</span>
             <textarea name="noteExtra" rows="2" placeholder="Vì sao tài liệu này hữu ích…"></textarea></label>
