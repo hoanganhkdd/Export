@@ -307,7 +307,7 @@ table.slide-table tr:first-child td { background: var(--surface-2); font-weight:
 .res-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
 .res-type { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--accent); }
 .res-title { font-weight: 600; font-size: .95rem; word-break: break-word; }
-.res-note { font-size: .84rem; color: var(--text-2); white-space: pre-wrap; word-break: break-word; }
+.res-note { font-size: .84rem; color: var(--text-2); white-space: pre-wrap; word-break: break-word; max-height: 260px; overflow-y: auto; }
 .res-tags { display: flex; flex-wrap: wrap; gap: 5px; }
 .res-tag { font-size: .72rem; background: var(--surface-2); padding: 2px 8px; border-radius: 6px; color: var(--text-2); }
 .res-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 6px; }
